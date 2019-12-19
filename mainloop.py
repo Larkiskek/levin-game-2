@@ -4,6 +4,7 @@ import player_config
 import tarakan
 import draw
 import math
+import pictures_name
 
 
 
@@ -14,6 +15,8 @@ class Game():
         self.parameter = 'Menu' # 0 - выход, 1 - игра, 2 - смерть, 3 - вход в комнату
 
     def update_screen(self):
+        if self.parameter == 'Restart':
+            self.parameter = 'New room'
         for i in range (0, 5):
             if self.parameter == 'New room':
                 self.room = scene.Room(i)
@@ -29,7 +32,7 @@ class Game():
             pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.parameter = 'Exit'
+                    exit()
             self.actions()
 
             self.player.damage()
@@ -69,7 +72,7 @@ class Game():
             pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.parameter = 'Exit'
+                    exit()
             self.actions()
 
             draw.room(self.win)                  #рисуем локацию
@@ -113,7 +116,10 @@ class Game():
             self.player.damage_right()
     
         if keys[pygame.K_q]:
-            self.player.change_weapon()  
+            self.player.change_weapon() 
+
+        if keys[pygame.K_r]:
+            self.parameter = 'Restart' 
 
 
     def menu(self):
@@ -122,7 +128,7 @@ class Game():
             pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.parameter = 'Exit'
+                    exit()
             draw.start_page(self.win)
             if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_RETURN]):
                 self.parameter = 'New room'
@@ -138,7 +144,7 @@ class Game():
             pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.parameter = 'Exit'       
+                    exit()       
             draw.title_death(self.win)
             if pygame.key.get_pressed()[pygame.K_RETURN]:
                 self.parameter = 'Menu'
@@ -151,7 +157,7 @@ class Game():
             pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.parameter = 'Exit'        
+                    exit()        
             draw.title_victory(self.win)
             if pygame.key.get_pressed()[pygame.K_RETURN]:
                 self.parameter = 'Menu'

@@ -5,8 +5,8 @@ import random
 
 list_enemies = []
 list_enemies.append([
-0,
-[0, 0, 0, 0, 0]
+1,
+[0, 0, 0, 0, 1]
 ])
 #первая комната
 list_enemies.append([
@@ -125,12 +125,12 @@ class Gate():
 
 class Enemies():
 	def __init__(self):
-		     #   [ type, wight, hight,  HP,  speed,       color,     jump_duration,  jump_cd, jump_speed]
-		self.S  = (  0,     40,    40,   50,     2,    (   0, 255, 0),       40,          100,       10)
-		self.M  = (  1,     60,    60,  100,     3,    ( 255, 165, 0),        0,          500,       0 )
-		self.L  = (  2,     80,    80,  200,     4,    ( 255,  69, 0),        0,          100,       0 )
-		self.XL = (  3,    120,   120,  500,     3,    ( 139,   0, 0),       40,          500,       4 )
-		self.BOSS=(  4,    500,   500, 3000,     2,    ( 139,  69,19),        0,            0,       0 )
+		     #   [ type, wight, hight,  HP,  speed,       color,     jump_duration,  jump_cd, jump_speed,  shift_x, shift_y]
+		self.S  = (  0,     40,    40,   50,     0,    (   0, 255, 0),       40,          100,       10,      0,      0    )
+		self.M  = (  1,     70,    70,  100,     0,    ( 255, 165, 0),        0,          500,       0,       0,      0    )
+		self.L  = (  2,    100,    80,  200,     0,    ( 255,  69, 0),        0,          100,       0,       0,      0    )
+		self.XL = (  3,    200,   200,  500,     0,    ( 139,   0, 0),       40,          500,       4,       0,      0    )
+		self.BOSS=(  4,    550,   500, 3000,     0.1,    ( 139,  69,19),        0,          500,       0,       0,     30   )
 		self.characters = [self.S, self.M, self.L, self.XL, self.BOSS]
 
 		self.list = []
@@ -141,10 +141,17 @@ class Enemies():
 				x = win_wight
 				y = win_hight
 				while ((abs(x-win_wight) < 100) and (abs(y-win_hight) < 100)): 
-					x = random.randint(70, (win_wight - 70))
-					y = random.randint(170,(win_hight - 70))
+					x = random.randint(70, (2*win_wight - 70))
+					y = random.randint(170,(2*win_hight - 70))
 				self.list.append( T(x, y, self.characters[i]))
 
+
+		'''self.S  = (  0,     40,    40,   50,     2,    (   0, 255, 0),       40,          100,       10)
+		self.M  = (  1,     60,    60,  100,     3,    ( 255, 165, 0),        0,          500,       0 )
+		self.L  = (  2,     80,    80,  200,     4,    ( 255,  69, 0),        0,          100,       0 )
+		self.XL = (  3,    120,   120,  500,     3,    ( 139,   0, 0),       40,          500,       4 )
+		self.BOSS=(  4,    500,   500, 3000,     2,    ( 139,  69,19),        0,            0,       0 )
+		self.characters = [self.S, self.M, self.L, self.XL, self.BOSS]'''
 
 
 

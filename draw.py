@@ -1,6 +1,8 @@
 import pygame
 import player_config
 import scene
+import pictures_name
+import math
 
 def draw_player(win,object):
 	player(win, object)
@@ -8,13 +10,12 @@ def draw_player(win,object):
 	damage(win, object)
 	CD(win, object)
 
-def player(win, player):
-    pygame.draw.rect(win, player.color, player.coordinates()) #рисуем игрока
     
 def tarakan(win, tarakan):
-    pygame.draw.rect(win, tarakan.color, tarakan.coordinates())
-    if tarakan.type == 4:
-    	BOSS_HP(win, tarakan.health)
+	win.blit(tarakan.picture, tarakan.picture.get_rect(center = tarakan.coordinates()))
+	pygame.draw.ellipse(win, tarakan.color, (math.trunc(tarakan.x-tarakan.half_wight), math.trunc(tarakan.y-tarakan.half_hight), 2*tarakan.half_wight, 2*tarakan.half_hight))
+	if tarakan.type == 4:
+		BOSS_HP(win, tarakan.health)
 
 def HP(win, player):
 	for i in range (player.health ):
@@ -43,7 +44,7 @@ def bullet(win, player):
 		pygame.draw.rect(win, (0,0,255), bullet.coordinates)
 
 def room(win):
-	win.fill((0,0,0))
+	win.fill((0,0,100))
 
 def gate(win, coordinates):
 	pygame.draw.rect(win, (255, 255 ,255), coordinates )
@@ -68,3 +69,15 @@ def BOSS_HP(win, HP):
 def items(win, items):
 	for item in items:
 		pygame.draw.rect(win, item[2], item[3])
+
+
+def player(win, player):
+    pygame.draw.rect(win, player.color, player.coordinates()) #рисуем игрока
+    win.blit(pictures_name.body, pictures_name.body.get_rect(center = (player.x, player.y)))
+    wings(win, player)
+
+def wings(win, player):
+	if pictures_name.time_wings == 80:
+		pictures_name.time_wings = 0
+	win.blit(pictures_name.azazel_wings[pictures_name.time_wings//10], pictures_name.azazel_wings[pictures_name.time_wings//10].get_rect(center = (player.x, player.y)))
+	pictures_name.time_wings += 1

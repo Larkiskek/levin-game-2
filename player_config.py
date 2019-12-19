@@ -11,7 +11,7 @@ class Player():
         self.half_wight = wight/2
         self.color = (255, 0 , 0)
 
-        self.cd_max = 200
+        self.cd_max = 20
         self.td_max = 100 # td - это time damage. Функция перезарядки. td_max - это фактическая, а td - оставшаяся до следующего выстрела
         self.td = 0
 
@@ -20,7 +20,7 @@ class Player():
 
         self.speed = 7
 
-        self.lazer_characters = {'lenght':100, 'wight':25, 'damage':5}
+        self.lazer_characters = {'lenght':100, 'wight':25, 'damage':50}
         self.bullet_characters = {'speed': 5,'damage': 30}
 
         self.direction_horizontal = 0
@@ -29,7 +29,7 @@ class Player():
         self.lazer.update(self)
         self.bullets = [] 
 
-        self.max_health = 3
+        self.max_health = 30
         self.health = self.max_health
 
         self.weapon = -1

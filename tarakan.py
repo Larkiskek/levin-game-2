@@ -2,17 +2,22 @@ import scene
 import player_config
 import random
 import math
+import pictures_name
 
 
 class Tarakan():
     def __init__(self, x, y, characteristic):
         self.x = x
         self.y = y
+        self.shift_x = characteristic[9]
+        self.shift_y = characteristic[10]
 
         self.type = characteristic[0]
+        self.picture = pictures_name.tarakan_pictures[self.type]
   
-        self.half_hight = characteristic[2] /2
-        self.half_wight = characteristic[1] /2
+        self.half_hight = characteristic[2] //2
+        self.half_wight = characteristic[1] //2
+        self.p = self.half_hight / self.half_wight
         self.color = characteristic[5]
 
         self.speed = characteristic[4]
@@ -33,7 +38,7 @@ class Tarakan():
 
 
     def coordinates(self):
-        return (self.x-self.half_wight, self.y-self.half_hight, 2*self.half_wight, 2*self.half_hight) 
+        return (self.x - self.shift_x, self.y-self.shift_y )
 
     def dinamics(self, player):
         if player.td > (player.cd_max *player.weapon): #Тут, конечно, дикий костыль
@@ -43,7 +48,7 @@ class Tarakan():
     def move(self, player):
         if self.stop_move == 0:
             r = ( (player.x - self.x)**2 + (self.y - player.y)**2 )**0.5
-            if ( abs(self.x - player.x) < player.half_wight + self.half_wight ) and ( abs(self.y - player.y) < player.half_hight + self.half_hight ):
+            if ( (player.x - self.x)**2 + (self.p*(player.y - self.y))**2 < self.half_wight**2 ):
                 self.stop_move = self.stop_move_max
             self.jump()
             self.x += self.speed * (player.x - self.x) / r + self.jump_speed_x

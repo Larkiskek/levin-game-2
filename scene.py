@@ -32,15 +32,6 @@ list_enemies.append([
 ])
 
 
-list_items = [
-#   name       S   HP   LD   LCD    LR   BD  BCD  BS 
-#   default	   7         5   200   100   30   30   5
-['LAZER UP', ( 1,   0,   5,  100,  100,   0,   0,  0  ), (139, 0,   0) ],
-['SPEED UP', ( 8,   0,   0,    0,    0,   0,   0,  0  ), (148, 0, 211) ],
-['BULLET UP',( 0,   5,   0,    0,    0,   0,   0,  0  ), (  0, 0, 139) ]
-]
-
-
 
 
 

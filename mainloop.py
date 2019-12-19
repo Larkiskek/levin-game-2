@@ -16,69 +16,73 @@ class Game():
     def update_screen(self):
         for i in range (0, 5):
             if self.parameter == 'New room':
-                room = scene.Room(i)
+                self.room = scene.Room(i)
                 self.parameter = 'Continue game'
             else: 
                 break
-            while self.parameter == 'Continue game':
-                pygame.time.delay(10)
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        self.parameter = 'Exit'
-                self.actions()
+            self.play()
+            self.exit_room()
 
-                self.player.damage()
+    def play(self):
+        while self.parameter == 'Continue game':
+            print
+            pygame.time.delay(10)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.parameter = 'Exit'
+            self.actions()
+
+            self.player.damage()
     
 
-                draw.room(self.win)                  #рисуем локацию
-                draw.draw_player(self.win, self.player)
+            draw.room(self.win)                  #рисуем локацию
+            draw.draw_player(self.win, self.player)
 
 
-                for tar in room.tarakanS:
-                    draw.tarakan(self.win, tar)
-                    tar.dinamics(self.player)
-                    self.player.get_damage(tar)
-                    if tar.health <= 0:
-                        room.tarakanS.remove(tar)
+            for tar in self.room.tarakanS:
+                draw.tarakan(self.win, tar)
+                tar.dinamics(self.player)
+                self.player.get_damage(tar)
+                if tar.health <= 0:
+                    self.room.tarakanS.remove(tar)
     
 
-                if room.time_before_create > 0:
-                    room.time_before_create -= 1
-                if len(room.tarakanS) == 0:
-                    if room.number_wave > room.list_enemies[0]:
-                       self.parameter = 'Items' 
-                    else:
-                        draw.pip(self.win)
-                        if ( abs( self.player.x - scene.win_wight ) < 25 ) and ( abs( self.player.y - scene.win_hight ) < 25 ):
-                            room.create_enemies(scene.list_enemies)
-
-                self.player.health_check(self)
-                pygame.display.update()
-
-            if self.parameter == 'Items':
-                room.create_items()
-            while self.parameter == 'Items':
-                pygame.time.delay(10)
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        self.parameter = 'Exit'
-                self.actions()
-
-                draw.room(self.win)                  #рисуем локацию
-                draw.draw_player(self.win, self.player)
-
-                draw.gate(self.win, room.gate.coordinates)
-                room.gate.input(self)
-                room.items_check(self.player)
-                draw.items(self.win, room.items)
-
-                self.player.damage()
-
-                pygame.display.update()
+            if self.room.time_before_create > 0:
+                self.room.time_before_create -= 1
+            if len(self.room.tarakanS) == 0:
+                if self.room.number_wave > self.room.list_enemies[0]:
+                    self.parameter = 'Items' 
+                else:
+                    draw.pip(self.win)
+                    if ( abs( self.player.x - scene.win_wight ) < 25 ) and ( abs( self.player.y - scene.win_hight ) < 25 ):
+                        self.room.create_enemies(scene.list_enemies)
 
 
+            self.player.health_check(self)
+            pygame.display.update()
 
 
+    def exit_room(self):
+        if self.parameter == 'Items':
+            self.room.create_items()
+        while self.parameter == 'Items':
+            pygame.time.delay(10)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.parameter = 'Exit'
+            self.actions()
+
+            draw.room(self.win)                  #рисуем локацию
+            draw.draw_player(self.win, self.player)
+
+            draw.gate(self.win, self.room.gate.coordinates)
+            self.room.gate.input(self)
+            self.room.items_check(self.player)
+            draw.items(self.win, self.room.items)
+
+            self.player.damage()
+
+            pygame.display.update()
 
 
     def actions(self):

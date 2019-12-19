@@ -9,7 +9,7 @@ import math
 
 class Game():
     def __init__(self):
-        self.player = player_config.Player(500, 500, 40, 20) #x, y, half_wight, half_hight
+        self.player = player_config.Player(50, win_hight, 40, 20) #x, y, half_wight, half_hight
         self.win = pygame.display.set_mode((2*scene.win_wight, 2*scene.win_hight))
         self.parameter = 'Menu' # 0 - выход, 1 - игра, 2 - смерть, 3 - вход в комнату
 
@@ -46,8 +46,7 @@ class Game():
                     room.time_before_create -= 1
                 if len(room.tarakanS) == 0:
                     if room.number_wave > room.list_enemies[0]:
-                        draw.gate(self.win, room.gate.coordinates)
-                        room.output(self)
+                       self.parameter = 'Items' 
                     else:
                         draw.pip(self.win)
                         if ( abs( self.player.x - scene.win_wight ) < 25 ) and ( abs( self.player.y - scene.win_hight ) < 25 ):
@@ -55,6 +54,31 @@ class Game():
 
                 self.player.health_check(self)
                 pygame.display.update()
+
+            if self.parameter == 'Items':
+                room.create_items()
+            while self.parameter == 'Items':
+                pygame.time.delay(10)
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.parameter = 'Exit'
+                self.actions()
+
+                draw.room(self.win)                  #рисуем локацию
+                draw.draw_player(self.win, self.player)
+
+                draw.gate(self.win, room.gate.coordinates)
+                room.gate.input(self)
+                room.items_check(self.player)
+                draw.items(self.win, room.items)
+
+                self.player.damage()
+
+                pygame.display.update()
+
+
+
+
 
 
     def actions(self):
@@ -114,7 +138,7 @@ class Game():
             draw.title_death(self.win)
             if pygame.key.get_pressed()[pygame.K_RETURN]:
                 self.parameter = 'Menu'
-                self.player.health  = self.player.max_health
+                self.player = player_config.Player(50, win_hight, 40, 20)
             pygame.display.update()
 
 
@@ -127,6 +151,7 @@ class Game():
             draw.title_victory(self.win)
             if pygame.key.get_pressed()[pygame.K_RETURN]:
                 self.parameter = 'Menu'
+                self.player = player_config.Player(50, win_hight, 40, 20)
             pygame.display.update()
 
 

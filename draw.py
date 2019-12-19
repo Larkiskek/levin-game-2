@@ -64,3 +64,7 @@ def pip(win):
 def BOSS_HP(win, HP):
 	pygame.draw.rect(win, (255, 0, 0), (scene.win_wight-200, 2*scene.win_hight - 50, 400, 30), 5)
 	pygame.draw.rect(win, (255, 0, 0), (scene.win_wight-200, 2*scene.win_hight - 50, 4*HP // 30, 30)) 
+
+def items(win, items):
+	for item in items:
+		pygame.draw.rect(win, item[2], item[3])

@@ -32,8 +32,13 @@ list_enemies.append([
 ])
 
 
-
-
+list_items = [
+#   name       S   HP   LD   LCD    LR   BD  BCD  BS 
+#   default	   7         5   200   100   30   30   5
+['LAZER UP', ( 1,   0,   5,  100,  100,   0,   0,  0  ), (139, 0,   0) ],
+['SPEED UP', ( 8,   0,   0,    0,    0,   0,   0,  0  ), (148, 0, 211) ],
+['BULLET UP',( 0,   5,   0,    0,    0,   0,   0,  0  ), (  0, 0, 139) ]
+]
 
 
 
@@ -62,6 +67,7 @@ class Room():
 		self.list_enemies = list_enemies[self.number]
 		self.enemy = Enemies()
 		self.tarakanS = []
+		self.items = []
 
 	def create_enemies(self, list_enemies):
 			self.enemy.generate(self.list_enemies[self.number_wave])
@@ -73,8 +79,40 @@ class Room():
 		if self.time_before_create == 0:
 			self.gate.input(game)
 
-	def items():
-		pass
+	def create_items(self):
+		self.list_items  = [
+							#   name       S   HP   LD   LCD    LR   BD  BCD  BS 
+							#   default	   7         5   200   100   30   30   5
+							['LAZER UP', ( 1,   0,   5,  100,  100,   0,   0,  0  ), (139, 0,   0) ],
+							['SPEED UP', ( 8,   0,   0,    0,    0,   0,   0,  0  ), (148, 0, 211) ],
+							['BULLET UP',( 0,   5,   0,    0,    0,   0,   0,  0  ), (  0, 0, 139) ]
+							]
+		for i in range (0, 2):
+			number = random.randint(0, len(self.list_items)-1)
+			item = self.list_items[ number ]
+			item.append((win_wight +100*i-50, win_hight, 50, 50))  
+			self.items.append(item)
+			del self.list_items[number]
+
+	def items_check(self, player):
+		for item in self.items:
+			x = item[3][0]
+			y = item[3][1]
+			if ( abs(player.x - x) < (25 + player.half_wight) ) and ( abs(player.y - y) < (25 + player.half_hight) ):
+				player.speed += item[1][0]
+				player.health += item[1][1]				
+				player.lazer_characters['damage'] += item[1][2]
+				player.cd_max -= item[1][3]
+				if player.cd_max < 1:
+					player.cd_max = 1
+				player.lazer_characters['lenght'] += item[1][4]
+				player.bullet_characters['damage'] += item[1][5]
+				player.shoot_cd_max -= item[1][6]
+				if player.shoot_cd_max < 1:
+					player.shoot_cd_max = 1
+				player.bullet_characters['speed'] += item[1][7]
+				self.items = []
+
 
 
 
@@ -117,7 +155,5 @@ class Enemies():
 				self.list.append( T(x, y, self.characters[i]))
 
 
-class Item():
-	def __init__(self):
-		pass
+
 

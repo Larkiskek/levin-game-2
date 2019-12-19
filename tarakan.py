@@ -54,10 +54,10 @@ class Tarakan():
 
     def get_damage(self, player):
         if ( self.x > player.lazer.coordinates[0] - self.half_wight ) and ( self.y > player.lazer.coordinates[1] - self.half_hight ) and (  (player.lazer.coordinates[0] + player.lazer.coordinates[2] + self.half_wight ) > self.x  ) and (  (player.lazer.coordinates[1] + player.lazer.coordinates[3] + self.half_hight) > self.y) and (player.weapon == 1):
-                self.health -= 5
+                self.health -= player.lazer.damage
         for bullet in player.bullets:
             if ( self.x > bullet.coordinates[0] - self.half_wight ) and ( self.y > bullet.coordinates[1] - self.half_hight ) and (  (bullet.coordinates[0] + bullet.coordinates[2] + self.half_wight ) > self.x  ) and (  (bullet.coordinates[1] + bullet.coordinates[3] + self.half_hight) > self.y):
-                self.health -= 30
+                self.health -= bullet.damage
                 player.bullets.remove(bullet)
 
 

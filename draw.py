@@ -12,8 +12,11 @@ def draw_player(win,object):
 
     
 def tarakan(win, tarakan):
-	win.blit(tarakan.picture, tarakan.picture.get_rect(center = tarakan.coordinates()))
-	pygame.draw.ellipse(win, tarakan.color, (math.trunc(tarakan.x-tarakan.half_wight), math.trunc(tarakan.y-tarakan.half_hight), 2*tarakan.half_wight, 2*tarakan.half_hight))
+	if tarakan.animation_time == -1:
+		tarakan.animation_time = 20*len(tarakan.picture) -1
+	win.blit(tarakan.picture[tarakan.animation_time//20], tarakan.picture[tarakan.animation_time//20].get_rect(center = tarakan.coordinates()))
+	tarakan.animation_time -= 1
+	#pygame.draw.ellipse(win, tarakan.color, (math.trunc(tarakan.x-tarakan.half_wight), math.trunc(tarakan.y-tarakan.half_hight), 2*tarakan.half_wight, 2*tarakan.half_hight))
 	if tarakan.type == 4:
 		BOSS_HP(win, tarakan.health)
 

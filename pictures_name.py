@@ -41,10 +41,20 @@ pygame.image.load('pictures/1/9.png'),
 
 tarakan_pictures = [
 
-scale(2, pygame.image.load('pictures/4/103201.png')),
-scale(3, pygame.image.load('pictures/4/100900.png')),
-scale(4, pygame.image.load('pictures/4/100901.png')),
-scale(8, pygame.image.load('pictures/4/64681.png')),
-scale(10, pygame.image.load('pictures/2/9.png'))
+[scale(2, pygame.image.load('pictures/4/103201.png')), 
+scale(2, pygame.image.load('pictures/4/103200.png'))],
+
+[scale(3, pygame.image.load('pictures/4/100900.png')),
+scale(3, pygame.image.load('pictures/4/100899.png')),
+scale(3, pygame.image.load('pictures/4/100898.png'))],
+
+[scale(4, pygame.image.load('pictures/4/100901.png')),
+scale(4, pygame.image.load('pictures/4/100902.png')),
+scale(4, pygame.image.load('pictures/4/100903.png'))],
+
+[scale(8, pygame.image.load('pictures/4/64681.png')),
+scale(8, pygame.image.load('pictures/4/64682.png'))],
+
+[scale(10, pygame.image.load('pictures/2/9.png'))]
 
 ]

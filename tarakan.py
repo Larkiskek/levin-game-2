@@ -36,6 +36,8 @@ class Tarakan():
         self.jump_speed = characteristic[8]
         self.jump_time = self.jump_duration + self.jump_cd
 
+        self.animation_time = 0
+
 
     def coordinates(self):
         return (self.x - self.shift_x, self.y-self.shift_y )

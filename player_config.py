@@ -4,11 +4,9 @@ import draw
 import math
 
 class Player():
-    def __init__(self, x, y, wight, hight):
+    def __init__(self, x, y):
         self.x = x
         self.y = y 
-        self.half_hight = hight/2
-        self.half_wight = wight/2
         self.color = (255, 0 , 0)
 
         self.cd_max = 200 # td - это time damage. Функция перезарядки. td_max - это фактическая, а td - оставшаяся до следующего выстрела
@@ -20,16 +18,10 @@ class Player():
 
         self.speed = 7
 
-        self.lazer_characters = {'lenght':100, 'wight':25, 'damage':50}
+        self.lazer_characters = {'lenght':80, 'wight':25, 'damage':50}
         self.bullet_characters = {'speed': 5,'damage': 30}
 
-        self.direction_horizontal = 0
-        self.direction_vertical = 0
-        self.lazer = Lazer( self.direction_horizontal, self.direction_vertical, self.lazer_characters)
-        self.lazer.update(self)
-        self.bullets = [] 
-
-        self.max_health = 30
+        self.max_health = 3
         self.health = self.max_health
 
         self.weapon = -1
@@ -39,7 +31,14 @@ class Player():
         self.direction = 0
         self.direction_head = 0
 
+        self.direction_horizontal = 0
+        self.direction_vertical = 0
+        self.lazer = Lazer( self )
+        self.lazer.update(self)
+        self.bullets = [] 
 
+        self.size = 60
+        self.time_weapon = 20
 
     def move_up(self):
         if self.y >=100:
@@ -59,7 +58,7 @@ class Player():
         self.direction = 4
 
     def coordinates(self):
-        return (self.x-self.half_wight, self.y-self.half_hight, 2*self.half_wight, 2*self.half_hight)
+        return (self.x, self.y) 
 
 
 
@@ -122,9 +121,13 @@ class Player():
 
 
 
+
     def change_weapon(self):
+        if self.time_weapon != 0:
+            self.time_weapon -= 1
         if self.lazer.status == 'OFF':
             self.weapon = -self.weapon
+            self.time_weapon = 20
 
     def get_damage(self, tarakan):
         if tarakan.stop_move == (tarakan.stop_move_max - 1) :
@@ -151,7 +154,7 @@ class Bullet():
         self.speed_x =  direction_horizontal * self.speed
         self.speed_y =  direction_vertical * self.speed 
 
-        self.coordinates = ( self.x - self.size, self.y - self.size, 2*self.size, 2*self.size )
+        self.coordinates = ( self.x, self.y )
 
         self.distance = 0
         self.distance_max = 500
@@ -161,7 +164,7 @@ class Bullet():
         self.x += self.speed_x
         self.y += self.speed_y
         self.distance += self.speed  
-        self.coordinates = ( self.x - self.size, self.y - self.size, 2*self.size, 2*self.size )
+        self.coordinates = ( self.x, self.y )
 
 
 
@@ -170,20 +173,21 @@ class Bullet():
 
 
 class Lazer():
-    def __init__(self, direction_horizontal, direction_vertical, lazer_characters):
-        self.lenght_max = lazer_characters['lenght'] # размер дамаг-площадки. Без _max -динамические величины, показывающие область дамага сейчас
-        self.wight_max = lazer_characters['wight']
+    def __init__(self, player):
+        self.lenght_max = player.lazer_characters['lenght'] # размер дамаг-площадки. Без _max -динамические величины, показывающие область дамага сейчас
+        self.wight_max = player.lazer_characters['wight']
         self.status = 'OFF'
 
-        self.damage = lazer_characters['damage']
+        self.damage = player.lazer_characters['damage']
 
-        self.direction_horizontal = direction_horizontal
-        self.direction_vertical = direction_vertical
+        self.direction_horizontal = player.direction_horizontal
+        self.direction_vertical = player.direction_vertical
+        self.direction = player.direction_head
 
-        self.x_0 = (direction_horizontal)*abs(direction_horizontal-1)*self.lenght_max - abs(direction_vertical)*self.wight_max
-        self.y_0 = (direction_vertical)*abs(direction_vertical-1)*self.lenght_max - abs(direction_horizontal)*self.wight_max
-        self.wight = 2*abs(direction_vertical)*self.wight_max + 2*abs(direction_horizontal)*self.lenght_max
-        self.hight = 2*abs(direction_horizontal)*self.wight_max + 2*abs(direction_vertical)*self.lenght_max
+        self.x_0 = (player.direction_horizontal)*abs(player.direction_horizontal-1)*self.lenght_max - abs(player.direction_vertical)*self.wight_max
+        self.y_0 = (player.direction_vertical)*abs(player.direction_vertical-1)*self.lenght_max - abs(player.direction_horizontal)*self.wight_max
+        self.wight = 2*abs(player.direction_vertical)*self.wight_max + 2*abs(player.direction_horizontal)*self.lenght_max
+        self.hight = 2*abs(player.direction_horizontal)*self.wight_max + 2*abs(player.direction_vertical)*self.lenght_max
 
 
     def update(self, player):
@@ -192,6 +196,9 @@ class Lazer():
         self.coordinates = (self.x, self.y, self.wight, self.hight)
 
     def update_directions(self, player):
+        self.direction = player.direction_head
+        self.direction_horizontal = player.direction_horizontal
+        self.direction_vertical = player.direction_vertical        
         self.x_0 = (player.direction_horizontal)*abs(player.direction_horizontal-1)*self.lenght_max - abs(player.direction_vertical)*self.wight_max
         self.y_0 = (player.direction_vertical)*abs(player.direction_vertical-1)*self.lenght_max - abs(player.direction_horizontal)*self.wight_max
         self.wight = 2*abs(player.direction_vertical)*self.wight_max + 2*abs(player.direction_horizontal)*self.lenght_max

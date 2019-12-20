@@ -10,7 +10,6 @@ import pictures_name
 
 class Game():
     def __init__(self):
-        self.player = player_config.Player(50, win_hight, 40, 20) #x, y, half_wight, half_hight
         self.win = pygame.display.set_mode((2*scene.win_wight, 2*scene.win_hight))
         self.parameter = 'Menu' # 0 - выход, 1 - игра, 2 - смерть, 3 - вход в комнату
 
@@ -38,7 +37,7 @@ class Game():
             self.player.damage()
     
 
-            draw.room(self.win)                  #рисуем локацию
+            draw.room(self.win, self.room.number)                  #рисуем локацию
             draw.draw_player(self.win, self.player)
 
 
@@ -57,7 +56,7 @@ class Game():
                     self.parameter = 'Items' 
                 else:
                     draw.pip(self.win)
-                    if ( abs( self.player.x - scene.win_wight ) < 25 ) and ( abs( self.player.y - scene.win_hight ) < 25 ):
+                    if ( abs( self.player.x - scene.win_wight ) < 25 + self.player.size ) and ( abs( self.player.y - scene.win_hight ) < 25 + self.player.size ):
                         self.room.create_enemies(scene.list_enemies)
 
 
@@ -75,7 +74,7 @@ class Game():
                     exit()
             self.actions()
 
-            draw.room(self.win)                  #рисуем локацию
+            draw.room(self.win, self.room.number)                  #рисуем локацию
             draw.draw_player(self.win, self.player)
 
             draw.gate(self.win, self.room.gate.coordinates)
@@ -129,9 +128,10 @@ class Game():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
-            draw.start_page(self.win)
+            draw.menu(self.win)
             if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_RETURN]):
                 self.parameter = 'New room'
+                self.player = player_config.Player(50, win_hight)
             if pygame.key.get_pressed()[pygame.K_ESCAPE]:
                 self.parameter = 'Exit'
             if time_delay > 0:
@@ -148,7 +148,6 @@ class Game():
             draw.title_death(self.win)
             if pygame.key.get_pressed()[pygame.K_RETURN]:
                 self.parameter = 'Menu'
-                self.player = player_config.Player(50, win_hight, 40, 20)
             pygame.display.update()
 
 
@@ -161,7 +160,6 @@ class Game():
             draw.title_victory(self.win)
             if pygame.key.get_pressed()[pygame.K_RETURN]:
                 self.parameter = 'Menu'
-                self.player = player_config.Player(50, win_hight, 40, 20)
             pygame.display.update()
 
 

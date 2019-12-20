@@ -1,7 +1,7 @@
 import draw
 from tarakan import Tarakan as T
 import random
-
+import player_config
 
 list_enemies = []
 list_enemies.append([
@@ -72,11 +72,11 @@ class Room():
 
 	def create_items(self):
 		self.list_items  = [
-							#   name       S   HP   LD   LCD    LR   BD  BCD  BS 
-							#   default	   7         5   200   100   30   30   5
-							['LAZER UP', ( 1,   0,   5,  100,  100,   0,   0,  0  ), (139, 0,   0) ],
-							['SPEED UP', ( 8,   0,   0,    0,    0,   0,   0,  0  ), (148, 0, 211) ],
-							['BULLET UP',( 0,   5,   0,    0,    0,   0,   0,  0  ), (  0, 0, 139) ]
+							#   name       S   HP   LD   LCD   LR   BD  BCD  BS 
+							#   default	   7         5    1   100   30   30   5
+							['LAZER UP', ( 1,   0,   5,   1,  100,   0,   0,  0  ), (139, 0,   0) ],
+							['SPEED UP', ( 8,   0,   0,   0,    0,   0,   0,  0  ), (148, 0, 211) ],
+							['BULLET UP',( 0,   5,   0,   0,    0,   0,   0,  0  ), (  0, 0, 139) ]
 							]
 		for i in range (0, 2):
 			number = random.randint(0, len(self.list_items)-1)
@@ -93,9 +93,7 @@ class Room():
 				player.speed += item[1][0]
 				player.health += item[1][1]				
 				player.lazer_characters['damage'] += item[1][2]
-				player.cd_max -= item[1][3]
-				if player.cd_max < 1:
-					player.cd_max = 1
+				player.rate_of_lazer_fire += item[1][3]
 				player.lazer_characters['lenght'] += item[1][4]
 				player.bullet_characters['damage'] += item[1][5]
 				player.shoot_cd_max -= item[1][6]
@@ -103,6 +101,7 @@ class Room():
 					player.shoot_cd_max = 1
 				player.bullet_characters['speed'] += item[1][7]
 				self.items = []
+				player.lazer = player_config.Lazer(0, 0, player.lazer_characters)
 
 
 

@@ -3,10 +3,13 @@ import pygame
 def scale(n, pic):
 	return pygame.transform.scale(pic, (pic.get_width()*n, pic.get_height()*n))
 
-body = pygame.image.load('pictures/1/39.png')
-body = scale(4, body)
-
-time_wings = 0
+azazel_body = [
+scale(4, pygame.image.load('pictures/1/39.png')),
+scale(4, pygame.image.load('pictures/1/39.png')),
+scale(4, pygame.image.load('pictures/1/39.png')),
+scale(4, pygame.image.load('pictures/1/37.png')),
+scale(10, pygame.image.load('pictures/1/38.png'))
+]
 
 azazel_wings = [
 #вперёд
@@ -24,6 +27,21 @@ scale(4, pygame.image.load('pictures/1/31.png'))
 
 
 azazel_head = [
+[
+pygame.image.load('pictures/1/10.png'),
+pygame.image.load('pictures/1/11.png'),
+pygame.image.load('pictures/1/12.png'),
+pygame.image.load('pictures/1/13.png'),
+pygame.image.load('pictures/1/14.png'),
+pygame.image.load('pictures/1/15.png'),
+pygame.image.load('pictures/1/16.png'),
+
+pygame.image.load('pictures/1/1.png'),
+pygame.image.load('pictures/1/2.png'),
+pygame.image.load('pictures/1/3.png'),
+],
+
+[
 pygame.image.load('pictures/1/28.png'),
 pygame.image.load('pictures/1/27.png'),
 pygame.image.load('pictures/1/26.png'),
@@ -35,6 +53,35 @@ pygame.image.load('pictures/1/22.png'),
 pygame.image.load('pictures/1/7.png'),
 pygame.image.load('pictures/1/8.png'),
 pygame.image.load('pictures/1/9.png'),
+],
+
+[
+pygame.image.load('pictures/1/21.png'),
+pygame.image.load('pictures/1/20.png'),
+pygame.image.load('pictures/1/19.png'),
+pygame.image.load('pictures/1/19.png'),
+pygame.image.load('pictures/1/18.png'),
+pygame.image.load('pictures/1/18.png'),
+pygame.image.load('pictures/1/17.png'),
+
+pygame.image.load('pictures/1/4.png'),
+pygame.image.load('pictures/1/5.png'),
+pygame.image.load('pictures/1/6.png'),
+],
+
+[
+pygame.image.load('pictures/1/21.png'),
+pygame.image.load('pictures/1/20.png'),
+pygame.image.load('pictures/1/19.png'),
+pygame.image.load('pictures/1/19.png'),
+pygame.image.load('pictures/1/18.png'),
+pygame.image.load('pictures/1/18.png'),
+pygame.image.load('pictures/1/17.png'),
+
+pygame.image.load('pictures/1/4.png'),
+pygame.image.load('pictures/1/5.png'),
+pygame.image.load('pictures/1/6.png'),
+]
 ]
 
 

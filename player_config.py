@@ -11,9 +11,9 @@ class Player():
         self.half_wight = wight/2
         self.color = (255, 0 , 0)
 
-        self.cd_max = 20
-        self.td_max = 100 # td - это time damage. Функция перезарядки. td_max - это фактическая, а td - оставшаяся до следующего выстрела
+        self.cd_max = 200 # td - это time damage. Функция перезарядки. td_max - это фактическая, а td - оставшаяся до следующего выстрела
         self.td = 0
+        self.rate_of_lazer_fire = 1
 
         self.shoot_cd_max = 30
         self.shoot_cd = 0
@@ -34,20 +34,29 @@ class Player():
 
         self.weapon = -1
 
+        self.time_wings = 0
+        self.time_head = 0
+        self.direction = 0
+        self.direction_head = 0
+
 
 
     def move_up(self):
         if self.y >=100:
             self.y -= self.speed
+        self.direction = 1
     def move_down(self):
         if self.y <= 2*scene.win_hight - 100:
             self.y += self.speed
+        self.direction = 2
     def move_right(self):
         if self.x <= 2*scene.win_wight - 20:
             self.x += self.speed
+        self.direction = 3
     def move_left(self):
         if self.x >= 20:
             self.x -= self.speed
+        self.direction = 4
 
     def coordinates(self):
         return (self.x-self.half_wight, self.y-self.half_hight, 2*self.half_wight, 2*self.half_hight)
@@ -59,39 +68,50 @@ class Player():
     def damage_up(self):
         self.direction_vertical = -1
         self.direction_horizontal = 0
+        self.direction_head = 1
         self.shot()
     def damage_down(self):
         self.direction_vertical = 1
         self.direction_horizontal = 0
+        self.direction_head = 2
         self.shot()
     def damage_right(self):
         self.direction_vertical = 0
         self.direction_horizontal = 1
+        self.direction_head = 3
         self.shot()
     def damage_left(self):
         self.direction_vertical = 0
         self.direction_horizontal = -1
+        self.direction_head = 4
         self.shot()
 
     def shot(self):
-            if self.weapon == 1:
-                if self.td == 0:
-                    self.td = self.td_max + self.cd_max
-                    self.lazer = Lazer( self.direction_horizontal, self.direction_vertical, self.lazer_characters)
-                    self.lazer.update(self)
+            if (self.weapon == 1):
+                if self.lazer.status == 'OFF':
+                    self.lazer.status = 'CD'
+                    if self.td < self.cd_max:
+                        self.td += self.rate_of_lazer_fire
+                    self.lazer.update_directions(self)
             else:
                 if self.shoot_cd == 0:
                     self.shoot_cd = self.shoot_cd_max
                     bullet = Bullet(self.x, self.y, self.direction_horizontal, self.direction_vertical, self.bullet_characters) 
                     self.bullets.append( bullet )
 
-
     
 
     def damage(self):
-        if self.td != 0:
+        if (self.td >= self.cd_max) and self.lazer.status == 'OFF':
+            self.lazer.status = 'ON'
+        if self.lazer.status == 'OFF':
+            self.td = 0
+        if self.lazer.status == 'ON':
             self.lazer.update(self)
-            self.td -= 1
+            self.td -= 2
+        if self.lazer.status != 'ON' or self.td <= 0: 
+            self.lazer.status = 'OFF'
+
         if self.shoot_cd != 0:
             self.shoot_cd -= 1 
         for bullet in self.bullets:
@@ -103,8 +123,7 @@ class Player():
 
 
     def change_weapon(self):
-        if self.td == 0:
-            self.td = self.cd_max
+        if self.lazer.status == 'OFF':
             self.weapon = -self.weapon
 
     def get_damage(self, tarakan):
@@ -154,6 +173,7 @@ class Lazer():
     def __init__(self, direction_horizontal, direction_vertical, lazer_characters):
         self.lenght_max = lazer_characters['lenght'] # размер дамаг-площадки. Без _max -динамические величины, показывающие область дамага сейчас
         self.wight_max = lazer_characters['wight']
+        self.status = 'OFF'
 
         self.damage = lazer_characters['damage']
 
@@ -170,3 +190,9 @@ class Lazer():
         self.x = self.x_0 + player.x
         self.y = self.y_0 + player.y
         self.coordinates = (self.x, self.y, self.wight, self.hight)
+
+    def update_directions(self, player):
+        self.x_0 = (player.direction_horizontal)*abs(player.direction_horizontal-1)*self.lenght_max - abs(player.direction_vertical)*self.wight_max
+        self.y_0 = (player.direction_vertical)*abs(player.direction_vertical-1)*self.lenght_max - abs(player.direction_horizontal)*self.wight_max
+        self.wight = 2*abs(player.direction_vertical)*self.wight_max + 2*abs(player.direction_horizontal)*self.lenght_max
+        self.hight = 2*abs(player.direction_horizontal)*self.wight_max + 2*abs(player.direction_vertical)*self.lenght_max

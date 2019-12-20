@@ -26,21 +26,19 @@ def HP(win, player):
 
 def CD(win, player):
 	pygame.draw.rect(win, (255, 0, 0), (2*scene.win_wight-200, 10, 150, 30), 3)
-	if player.td == 0:
+	if player.td >= player.cd_max:
 		pygame.draw.rect(win, (255, 0, 0), (2*scene.win_wight-200, 10, 150, 30))
 	elif player.td < player.cd_max:
-		L = 150 - 150*player.td / player.cd_max
+		L = 150*player.td / player.cd_max
 		pygame.draw.rect(win, (255, 0, 0), (2*scene.win_wight-200, 10, L, 30)) 
 
 def damage(win, player):
-	if player.td > player.cd_max*player.weapon:
-		if player.weapon == 1:
 			lazer(win, player)
-		else:
 			bullet(win, player)
 
 def lazer(win, player):
-    pygame.draw.rect(win, (0,0,255), player.lazer.coordinates, 5)
+	if player.lazer.status == 'ON':
+		pygame.draw.rect(win, (255, 0,0), player.lazer.coordinates, 5)
 
 def bullet(win, player):
 	for bullet in player.bullets:
@@ -76,11 +74,26 @@ def items(win, items):
 
 def player(win, player):
     pygame.draw.rect(win, player.color, player.coordinates()) #рисуем игрока
-    win.blit(pictures_name.body, pictures_name.body.get_rect(center = (player.x, player.y)))
-    wings(win, player)
+    body(win, player)
+    if player.direction == 1:
+    	wings(win, player)
+    	head(win, player)
+    else:
+    	head(win, player)
+    	wings(win, player)
+    player.direction = 0
 
 def wings(win, player):
-	if pictures_name.time_wings == 80:
-		pictures_name.time_wings = 0
-	win.blit(pictures_name.azazel_wings[pictures_name.time_wings//10], pictures_name.azazel_wings[pictures_name.time_wings//10].get_rect(center = (player.x, player.y)))
-	pictures_name.time_wings += 1
+	if player.time_wings == 80:
+		player.time_wings = 0
+	win.blit(pictures_name.azazel_wings[player.time_wings//10], pictures_name.azazel_wings[player.time_wings//10].get_rect(center = (player.x, player.y)))
+	player.time_wings += 1
+
+def body(win, player):
+	win.blit(pictures_name.azazel_body[player.direction], pictures_name.azazel_body[player.direction].get_rect(center = (player.x, player.y)))
+
+
+def head(win, player):
+	pass
+
+	#head = pictures_name.azazel_body[player.direction]

@@ -18,13 +18,13 @@ class Player():
 
         self.speed = 7
 
-        self.lazer_characters = {'lenght':80, 'wight':25, 'damage':50}
+        self.lazer_characters = {'lenght':80, 'wight':25, 'damage':5}
         self.bullet_characters = {'speed': 5,'damage': 30}
 
         self.max_health = 3
         self.health = self.max_health
 
-        self.weapon = -1
+        self.weapon = 1
 
         self.time_wings = 0
         self.time_head = 0

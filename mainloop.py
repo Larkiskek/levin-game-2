@@ -118,7 +118,10 @@ class Game():
             self.player.change_weapon() 
 
         if keys[pygame.K_r]:
-            self.parameter = 'Restart' 
+            self.parameter = 'Restart'
+
+        if keys[pygame.K_ESCAPE]:
+            self.parameter = 'Save' 
 
 
     def menu(self):
@@ -132,7 +135,7 @@ class Game():
             if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_RETURN]):
                 self.parameter = 'New room'
                 self.player = player_config.Player(50, win_hight)
-            if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+            if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_ESCAPE]):
                 self.parameter = 'Exit'
             if time_delay > 0:
                 time_delay -= 1
@@ -162,6 +165,13 @@ class Game():
                 self.parameter = 'Menu'
             pygame.display.update()
 
+    def save(self):
+        if self.parameter == 'Save':
+            file = open('save5.txt', 'w')
+            file.write(str(self.player.health) + '\n')
+            file.close()
+            self.parameter = 'Menu'
+
 
 
 def main():
@@ -171,6 +181,7 @@ def main():
         game.update_screen()
         game.title_death()
         game.title_victory()
+        game.save()
 
 
     pygame.quit()

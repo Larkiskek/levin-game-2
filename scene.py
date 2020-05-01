@@ -94,6 +94,8 @@ class Room():
 			x = item[3][0]
 			y = item[3][1]
 			if ( abs(player.x - x) < (25 + player.size) ) and ( abs(player.y - y) < (25 + player.size) ):
+				player.taken_items.append(item[1])
+				player.taken_items[0] += 1
 				player.speed += item[2][0]
 				player.health += item[2][1]				
 				player.lazer_characters['damage'] += item[2][2]

@@ -12,22 +12,50 @@ class Game():
     def __init__(self):
         self.win = pygame.display.set_mode((2*scene.win_wight, 2*scene.win_hight))
         self.parameter = 'Menu' # 0 - выход, 1 - игра, 2 - смерть, 3 - вход в комнату
+        self.start_room = 0
+
+    def menu(self):
+        time_delay = 50
+        menu_mode = 0
+        while self.parameter == 'Menu':
+            pygame.time.delay(10)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
+            draw.menu(self.win, menu_mode)
+            if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_DOWN]):
+                menu_mode = ( menu_mode + 1 )%2
+                time_delay = 30
+            if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_UP]):
+                menu_mode = ( menu_mode - 1 )%2
+                time_delay = 30
+            if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_RETURN]):
+                self.parameter = 'Restart'
+                self.player = player_config.Player(50, scene.win_hight)
+                if menu_mode == 0:
+                    self.load_save()
+                    self.parameter = 'New room'
+            if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_ESCAPE]):
+                self.parameter = 'Exit'
+            if time_delay > 0:
+                time_delay -= 1
+            pygame.display.update()
 
     def update_screen(self):
         if self.parameter == 'Restart':
+            self.start_room = 0
             self.parameter = 'New room'
-        for i in range (0, 5):
+        for i in range (self.start_room, 5):
             if self.parameter == 'New room':
                 self.room = scene.Room(i)
-                self.parameter = 'Continue game'
+                self.parameter = 'Play game'
             else: 
                 break
             self.play()
             self.exit_room()
 
     def play(self):
-        while self.parameter == 'Continue game':
-            print
+        while self.parameter == 'Play game':
             pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -123,25 +151,6 @@ class Game():
         if keys[pygame.K_ESCAPE]:
             self.parameter = 'Save' 
 
-
-    def menu(self):
-        time_delay = 50
-        while self.parameter == 'Menu':
-            pygame.time.delay(10)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    exit()
-            draw.menu(self.win)
-            if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_RETURN]):
-                self.parameter = 'New room'
-                self.player = player_config.Player(50, win_hight)
-            if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_ESCAPE]):
-                self.parameter = 'Exit'
-            if time_delay > 0:
-                time_delay -= 1
-            pygame.display.update()
-
-
     def title_death(self):
         while self.parameter == 'Death':
             pygame.time.delay(10)
@@ -167,10 +176,29 @@ class Game():
 
     def save(self):
         if self.parameter == 'Save':
-            file = open('save5.txt', 'w')
+            file = open('save.txt', 'w')
             file.write(str(self.player.health) + '\n')
+            file.write(str(self.room.number) + '\n')
+            for i in range (0, self.player.taken_items[0] + 1):
+                file.write(str(self.player.taken_items[i]) + '\n')
             file.close()
             self.parameter = 'Menu'
+        elif  self.parameter == 'Menu':
+            self.delete_save()
+
+    def load_save(self):
+        file = open('save.txt', 'r')
+        self.player.health = int( file.readline() )
+        self.start_room = int( file.readline() )
+        file.close()
+
+    def delete_save(self):
+        file = open('save.txt', 'w')
+        file.write(self.player.max_health + '\n')
+        file.write(str(0) + '\n')
+        file.write(str(0) + '\n')
+        file.close()
+
 
 
 
@@ -182,10 +210,5 @@ def main():
         game.title_death()
         game.title_victory()
         game.save()
-
-
     pygame.quit()
 
-win_wight = 500
-win_hight = 500
-main()

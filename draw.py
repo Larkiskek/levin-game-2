@@ -51,25 +51,30 @@ def gate(win, coordinates):
 	pygame.draw.rect(win, (255, 215 , 0), coordinates )
 
 
-def menu(win):
+def menu(win, mode):
 	win.fill((255, 140 , 0))
 	pygame.font.init()
 	win.blit(pygame.font.Font(None, 100).render('MENU', 1, (180, 0, 0)), (400, 50))
-	win.blit(pygame.font.Font(None, 36).render('Press "Enter" to play', 1, (180, 0, 0)), (360, 700))
+	if mode == 0:
+		win.blit(pygame.font.Font(None, 50).render('Continue', 1, (255, 255, 0)), (400, 700))
+		win.blit(pygame.font.Font(None, 50).render('New game', 1, (180, 0, 0)), (400, 750))
+	else :
+		win.blit(pygame.font.Font(None, 50).render('Continue', 1, (180, 0, 0)), (400, 700))
+		win.blit(pygame.font.Font(None, 50).render('New game', 1, (255, 255, 0)), (400, 750))
 	#win.blit(pictures_name.menu, pictures_name.menu.get_rect(center = (scene.win_wight, scene.win_hight)))
 
 def title_victory(win):
 	win.fill((224, 255 ,255))
 	pygame.font.init()
 	win.blit(pygame.font.Font(None, 100).render('YOU WIN', 1, (255, 215, 0)), (375, 50))
-	win.blit(pygame.font.Font(None, 36).render('Press "Enter" to get to menu', 1, (255, 215, 0)), (325, 700))
+	win.blit(pygame.font.Font(None, 36).render('Press "Enter" to exit to menu', 1, (255, 215, 0)), (325, 700))
 	#win.blit(pictures_name.victory, pictures_name.victory.get_rect(center = (scene.win_wight, scene.win_hight)))
 
 def title_death(win):
 	win.fill((139, 0 , 0))
 	pygame.font.init()
 	win.blit(pygame.font.Font(None, 100).render('YOU DIED', 1, (0, 0, 0)), (350, 50))
-	win.blit(pygame.font.Font(None, 36).render('Press "Enter" to get to menu', 1, (0, 0, 0)), (325, 700))
+	win.blit(pygame.font.Font(None, 36).render('Press "Enter" to exit to menu', 1, (0, 0, 0)), (325, 700))
 	#win.blit(pictures_name.death, pictures_name.death.get_rect(center = (scene.win_wight, scene.win_hight)))
 
 def pip(win):

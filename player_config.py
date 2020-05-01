@@ -40,6 +40,8 @@ class Player():
         self.size = 60
         self.time_weapon = 20
 
+        self.taken_items = [0]
+
     def move_up(self):
         if self.y >=100:
             self.y -= self.speed

@@ -194,7 +194,7 @@ class Game():
 
     def delete_save(self):
         file = open('save.txt', 'w')
-        file.write(self.player.max_health + '\n')
+        file.write(str(self.player.max_health) + '\n')
         file.write(str(0) + '\n')
         file.write(str(0) + '\n')
         file.close()

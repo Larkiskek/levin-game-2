@@ -31,6 +31,12 @@ def CD(win, player):
 	elif player.td < player.cd_max:
 		L = 150*player.td / player.cd_max
 		pygame.draw.rect(win, (255, 0, 0), (2*scene.win_wight-200, 10, L, 30)) 
+	if player.weapon == 1:
+		win.blit(pygame.font.Font(None, 30).render('LAZER', 1, (180, 0, 0)), (2*scene.win_wight-200, 50))
+	else :
+		win.blit(pygame.font.Font(None, 30).render('BULLETS', 1, (0, 0, 180)), (2*scene.win_wight-200, 50))
+
+
 
 
 def lazer(win, player):

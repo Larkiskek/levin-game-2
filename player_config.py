@@ -127,9 +127,9 @@ class Player():
     def change_weapon(self):
         if self.time_weapon != 0:
             self.time_weapon -= 1
-        if self.lazer.status == 'OFF':
+        elif self.lazer.status == 'OFF':
             self.weapon = -self.weapon
-            self.time_weapon = 20
+            self.time_weapon = 10
 
     def get_damage(self, tarakan):
         if tarakan.stop_move == (tarakan.stop_move_max - 1) :

@@ -145,10 +145,10 @@ victory  = scale(1, pygame.image.load('pictures/6/h.png'))
 
 rooms = [
 pygame.image.load('pictures/6/3.jpg'),
-scale(1, pygame.image.load('pictures/6/b.png')),
-scale(1, pygame.image.load('pictures/6/d.png')),
-scale(1, pygame.image.load('pictures/6/g.png')),
-scale(1, pygame.image.load('pictures/6/e.png'))
+scale(3, pygame.image.load('pictures/6/b.png')),
+scale(3, pygame.image.load('pictures/6/d.png')),
+scale(3, pygame.image.load('pictures/6/g.png')),
+scale(3, pygame.image.load('pictures/6/e.png'))
 ]
 
 health = pygame.image.load('pictures/8/3.png')

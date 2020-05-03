@@ -1,4 +1,6 @@
 import mainloop
+import scene
 
 
-mainloop.main()
+#mainloop.main()
+scene.test_map()

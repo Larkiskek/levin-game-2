@@ -72,7 +72,7 @@ def menu(win, mode):
 def title_victory(win):
 	win.fill((224, 255 ,255))
 	pygame.font.init()
-	win.blit(pygame.font.Font(None, 100).render('YOU WIN', 1, (255, 215, 0)), (375, 50))
+	win.blit(pygame.font.Font(None, 100).render('YOU WIN!', 1, (255, 215, 0)), (375, 50))
 	win.blit(pygame.font.Font(None, 36).render('Press "Enter" to exit to menu', 1, (255, 215, 0)), (325, 700))
 	#win.blit(pictures_name.victory, pictures_name.victory.get_rect(center = (scene.win_wight, scene.win_hight)))
 
@@ -123,6 +123,14 @@ def head(win, player):
 		win.blit(pictures_name.azazel_head[player.direction_head][number], pictures_name.azazel_head[player.direction_head][number].get_rect(center = (player.x, player.y-30)))
 	if player.lazer.status == 'ON':
 		win.blit(pictures_name.azazel_head[player.lazer.direction][8], pictures_name.azazel_head[player.lazer.direction][8].get_rect(center = (player.x, player.y-30)))		
+
+def mini_map(win, the_map):
+	for i in range (0, the_map.max_map_size):
+			for j in range (0, the_map.max_map_size):
+				if the_map.rooms[i][j]['status'] == 'close':
+					pygame.draw.rect(win, (255, 255, 255), (2*scene.win_wight-200+i*15, 50+j*15, 15, 15))
+				else :
+					pygame.draw.rect(win, (0, 0, 0), (2*scene.win_wight-200+i*15, 50+j*15, 15, 15))
 
 
 	#head = pictures_name.azazel_body[player.direction]

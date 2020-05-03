@@ -3,6 +3,8 @@ from tarakan import Tarakan as T
 import random
 import player_config
 
+import pygame
+
 list_enemies = []
 list_enemies.append([
 0,
@@ -34,10 +36,98 @@ list_enemies.append([
 
 
 
-
-
 win_wight = 500
 win_hight = 500
+
+
+
+class Map():
+	def __init__ (self):
+		self.max_map_size = 11
+		self.rooms = []
+		self.now_location = [(self.max_map_size // 4)*2+1, (self.max_map_size // 4)*2+1]
+		self.the_way = []
+		self.next_room = [[1,0],[-1,0],[0,1],[0,-1]]
+		self.gold = 0
+
+	def create_map(self):
+		self.create_lattice()
+		for i in range (0, 3):
+			self.add_room('GOLD')
+		self.add_room('BOSS')
+
+
+	def create_lattice(self):
+		for i in range (0, self.max_map_size):
+			self.rooms.append([])
+			for j in range (0, self.max_map_size):
+				self.rooms[i].append([])
+				if (i == 0) or (j == 0) or (i == self.max_map_size-1) or (j == self.max_map_size-1) :
+					self.rooms[i][j]= dict(status = 'close')
+				elif i%2 == 1:
+					self.rooms[i][j]= dict(status = 'maybe open')
+				elif j%2 == 1:
+					self.rooms[i][j]= dict(status = 'close')
+				else:
+					self.rooms[i][j]= dict(status = 'maybe open')
+		self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'open'
+
+
+	def add_room(self, name):
+		while True:
+			self.now_location[0] = random.randint(1, self.max_map_size-1)
+			self.now_location[1] = random.randint(1, self.max_map_size-1)
+			while self.rooms[self.now_location[0]][self.now_location[1]]['status'] != 'open':
+				self.now_location[0] = random.randint(1, self.max_map_size-1)
+				self.now_location[1] = random.randint(1, self.max_map_size-1)
+			for j in range (0, 3):
+				self.move_to_the_next_room() 
+				if self.rooms[self.now_location[0]][self.now_location[1]]['status'] != 'maybe open':
+					self.welcome_back()
+					break
+			if self.rooms[self.now_location[0]][self.now_location[1]]['status'] == 'maybe open':
+				neighbors = 0
+				for j in range (0, 4):
+					if self.rooms[self.now_location[0]+self.next_room[j][0]][self.now_location[1]+self.next_room[j][1]]['status'] == 'open':
+						neighbors += 1
+				if neighbors == 1:
+					self.rooms[self.now_location[0]][self.now_location[1]]['status'] = name
+					self.gold +=1
+					self.the_way = []	
+					break
+				else:
+					self.welcome_back()
+
+	def move_to_the_next_room(self):
+		delta = random.randint(0,3)
+		self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'open'
+		while self.rooms[self.now_location[0]+self.next_room[delta][0]][self.now_location[1]+self.next_room[delta][1]]['status'] == 'close':
+			delta = random.randint(0,3)
+		self.now_location[0] += self.next_room[delta][0]
+		self.now_location[1] += self.next_room[delta][1]
+		self.the_way.append(delta)
+		
+
+	def welcome_back(self):
+		for i in range (0, len(self.the_way)):
+			delta = self.the_way[len(self.the_way)- i-1]
+			self.now_location[0] -= self.next_room[delta][0]
+			self.now_location[1] -= self.next_room[delta][1]
+			self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'maybe open'
+		self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'open'
+		self.the_way = []
+		
+
+
+	def print_map(self):
+		for i in range (0, self.max_map_size):
+			for j in range (0, self.max_map_size):
+				print(self.rooms[i][j]['status'])
+			print('\n')
+
+
+
+
 
 
 
@@ -111,9 +201,6 @@ class Room():
 
 
 
-
-
-
 class Gate():
 	def __init__ (self):
 		self.size = 100 
@@ -149,6 +236,46 @@ class Enemies():
 					x = random.randint(70, (2*win_wight - 70))
 					y = random.randint(170,(2*win_hight - 70))
 				self.list.append( T(x, y, self.characters[i]))
+
+
+
+def dr_map(x, y, win):
+	the_map = Map()
+	the_map.create_map()
+	for i in range (0, the_map.max_map_size):
+		for j in range (0, the_map.max_map_size):
+			if the_map.rooms[i][j]['status'] == 'open':
+				pygame.draw.rect(win, (255, 255, 255), (2*win_wight-200+i*15-x, 50+j*15+y, 15, 15))
+			elif the_map.rooms[i][j]['status'] == 'GOLD' :
+				pygame.draw.rect(win, (255, 255, 0), (2*win_wight-200+i*15-x, 50+j*15+y, 15, 15))
+			elif the_map.rooms[i][j]['status'] == 'BOSS':
+				pygame.draw.rect(win, (0, 0, 0), (2*win_wight-200+i*15-x, 50+j*15+y, 15, 15))
+			else:
+				pygame.draw.rect(win, (200, 200, 200), (2*win_wight-200+i*15-x, 50+j*15+y, 15, 15))
+	pygame.draw.rect(win, (255, 0, 0), (2*win_wight-200-x+the_map.now_location[0]*15+5, 50+y+the_map.now_location[1]*15+5, 5, 5))
+
+
+def test_map():
+	win = pygame.display.set_mode((2*win_wight, 2*win_hight))
+	#the_map = Map()
+	#the_map.create_map()
+	while not pygame.key.get_pressed()[pygame.K_ESCAPE]:
+		win.fill((240, 255 ,255))
+		#pygame.time.delay(100)
+		for i in range (0, 5):
+			for j in range (0, 5):
+				dr_map(200*i, 200*j, win)
+		#dr_map(500, 0, win, the_map)
+		#if pygame.key.get_pressed()[pygame.K_UP]:
+			#the_map.add_room('GOLD')
+		#if pygame.key.get_pressed()[pygame.K_DOWN]:
+			#the_map.welcome_back()
+		pygame.display.update()
+		for i in range (0, 1000):
+			pygame.time.delay(10)	
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					exit()
 
 
 

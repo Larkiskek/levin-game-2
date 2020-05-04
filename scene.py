@@ -4,36 +4,18 @@ import random
 import player_config
 import math
 
-import pygame
 
-list_enemies = []
-list_enemies.append([
-0
-])
-#первая комната
-list_enemies.append([
-1,
-[0, 2, 2, 0, 0]
-])
-#вторая комната
-list_enemies.append([
-1,
-[0, 0, 3, 1, 0]
-])
-#третья комната
-list_enemies.append([
-3,
-[5, 1, 0, 0, 0],
-[0, 0, 3, 3, 0],
-[10,1, 0, 1, 0]
-])
-#Босс - комната
-list_enemies.append([
-1,
-[0, 0, 0, 0, 1]
-])
-
-
+list_items  = [
+							#   name      №    S   HP   LD   LCD   LR   BD  BCD  BS 
+							#   default	       7    3    5    1   100   30   30   5
+							['LAZER UP',  0, ( 0,   0,   0,   1,    0,   0,   0,  0  ) ],
+							['SPEED UP',  1, ( 5,   0,   0,   0,    0,   0,   0,  0  ) ],
+							['BULLET UP', 2, ( 0,   2,   0,   0,    0,   0,   3,  0  ) ],
+							['LAZER UP',  3, ( 0,   1,   2,   1,    0,   0,   0,  0  ) ],
+							['SPEED UP',  4, ( 0,   0,   0,   0,    0,   7,   2,  1  ) ],
+							['BULLET UP', 5, ( 0,   0,   0,   0,    0,   0,   0,  3  ) ],
+							['люблю сон', 6, ( 0,   2,   1,   1,    0,   0,   0,  0  ) ]
+							]
 
 
 win_wight = 500
@@ -49,8 +31,8 @@ class Map():
 		self.the_way = []
 		self.next_room = [[1,0],[-1,0],[0,1],[0,-1]]
 		self.level = diff
-		self.mini_map = 1
-		self.mini_map_time = 0
+		self.mini_map = -1
+		self.mini_map_time = 0 
 
 	def create_map(self):
 		self.create_lattice()
@@ -198,41 +180,19 @@ class Room():
 			self.gate.input(game)
 
 	def create_items(self):
-		self.list_items  = [
-							#   name      №    S   HP   LD   LCD   LR   BD  BCD  BS 
-							#   default	       7    3    5    1   100   30   30   5
-							['LAZER UP',  0, ( 0,   0,   0,   1,    0,   0,   0,  0  ) ],
-							['SPEED UP',  1, ( 5,   0,   0,   0,    0,   0,   0,  0  ) ],
-							['BULLET UP', 2, ( 0,   2,   0,   0,    0,   0,   3,  0  ) ],
-							['LAZER UP',  3, ( 0,   1,   2,   1,    0,   0,   0,  0  ) ],
-							['SPEED UP',  4, ( 0,   0,   0,   0,    0,   7,   2,  1  ) ],
-							['BULLET UP', 5, ( 0,   0,   0,   0,    0,   0,   0,  3  ) ],
-							['люблю сон', 6, ( 0,   2,   1,   1,    0,   0,   0,  0  ) ]
-							]
+		listt = list_items[:]
 		for i in range (0, 2):
 			number = random.randint(0, 6-i)
-			item = self.list_items[ number ]
-			item.append((win_wight +200*i-100, win_hight))  
-			self.items.append(item)
-			del self.list_items[number]
+			self.items.append(listt[ number ])
+			self.items[i].append((win_wight +200*i-100, win_hight))
+			del listt[ number ]
 
 	def items_check(self, player, room):
 		for item in self.items:
 			x = item[3][0]
 			y = item[3][1]
 			if ( abs(player.x - x) < (25 + player.size) ) and ( abs(player.y - y) < (25 + player.size) ):
-				player.taken_items.append(item[1])
-				player.taken_items[0] += 1
-				player.speed += item[2][0]
-				player.health += item[2][1]				
-				player.lazer_characters['damage'] += item[2][2]
-				player.rate_of_lazer_fire += item[2][3]
-				player.lazer_characters['lenght'] += item[2][4]
-				player.bullet_characters['damage'] += item[2][5]
-				player.shoot_cd_max -= item[2][6]
-				if player.shoot_cd_max < 1:
-					player.shoot_cd_max = 1
-				player.bullet_characters['speed'] += item[2][7]
+				player.get_item(item)
 				self.items = []
 				player.lazer = player_config.Lazer(player)
 				room['status'] = 'open'
@@ -291,46 +251,5 @@ class Enemies():
 					x = random.randint(70, (2*win_wight - 70))
 					y = random.randint(170,(2*win_hight - 70))
 				self.list.append( T(x, y, self.characters[i]))
-
-
-
-def dr_map(x, y, win):
-	the_map = Map()
-	the_map.create_map()
-	for i in range (0, the_map.max_map_size):
-		for j in range (0, the_map.max_map_size):
-			if the_map.rooms[i][j]['status'] == 'open':
-				pygame.draw.rect(win, (255, 255, 255), (2*win_wight-200+i*15-x, 50+j*15+y, 15, 15))
-			elif the_map.rooms[i][j]['status'] == 'GOLD' :
-				pygame.draw.rect(win, (255, 255, 0), (2*win_wight-200+i*15-x, 50+j*15+y, 15, 15))
-			elif the_map.rooms[i][j]['status'] == 'BOSS':
-				pygame.draw.rect(win, (0, 0, 0), (2*win_wight-200+i*15-x, 50+j*15+y, 15, 15))
-			else:
-				pygame.draw.rect(win, (200, 200, 200), (2*win_wight-200+i*15-x, 50+j*15+y, 15, 15))
-	pygame.draw.rect(win, (255, 0, 0), (2*win_wight-200-x+the_map.now_location[0]*15+5, 50+y+the_map.now_location[1]*15+5, 5, 5))
-
-
-def test_map():
-	win = pygame.display.set_mode((2*win_wight, 2*win_hight))
-	#the_map = Map()
-	#the_map.create_map()
-	while not pygame.key.get_pressed()[pygame.K_ESCAPE]:
-		win.fill((240, 255 ,255))
-		#pygame.time.delay(100)
-		for i in range (0, 5):
-			for j in range (0, 5):
-				dr_map(200*i, 200*j, win)
-		#dr_map(500, 0, win, the_map)
-		#if pygame.key.get_pressed()[pygame.K_UP]:
-			#the_map.add_room('GOLD')
-		#if pygame.key.get_pressed()[pygame.K_DOWN]:
-			#the_map.welcome_back()
-		pygame.display.update()
-		for i in range (0, 10000):
-			pygame.time.delay(10)	
-			for event in pygame.event.get():
-				if event.type == pygame.QUIT:
-					exit()
-
 
 

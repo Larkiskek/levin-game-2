@@ -40,7 +40,7 @@ class Player():
         self.size = 60
         self.time_weapon = 20
 
-        self.taken_items = [0]
+        self.taken_items = []
 
     def move_up(self):
         if self.y >=100:
@@ -138,6 +138,19 @@ class Player():
     def health_check(self, game):
         if self.health <= 0:
             game.parameter = 'Death'
+
+    def get_item(self, item):
+        self.taken_items.append(item[1])
+        self.speed += item[2][0]
+        self.health += item[2][1]             
+        self.lazer_characters['damage'] += item[2][2]
+        self.rate_of_lazer_fire += item[2][3]
+        self.lazer_characters['lenght'] += item[2][4]
+        self.bullet_characters['damage'] += item[2][5]
+        self.shoot_cd_max -= item[2][6]
+        if self.shoot_cd_max < 1:
+            self.shoot_cd_max = 1
+        self.bullet_characters['speed'] += item[2][7]
 
 
 

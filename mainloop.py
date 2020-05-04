@@ -12,8 +12,6 @@ class Game():
     def __init__(self):
         self.win = pygame.display.set_mode((2*scene.win_wight, 2*scene.win_hight))
         self.parameter = 'Menu' 
-        self.difficalty = 3
-        self.map = scene.Map(3)
         self.menu_mode = dict(status = 'main', number = 0)
 
     def menu(self):
@@ -39,7 +37,9 @@ class Game():
                 time_delay = 30
                 if self.menu_mode['status'] == 'main':
                     if (self.menu_mode['number'] == 0) and self.save_status == 1:
+                        self.map = scene.Map(0)
                         self.player = player_config.Player(50, scene.win_hight)
+                        self.map.create_map()
                         self.parameter = 'New room'
                         self.load_save()
                     elif self.menu_mode['number'] == 1:
@@ -48,8 +48,9 @@ class Game():
                     elif self.menu_mode['number'] == 2:
                         self.parameter = 'Exit'
                 elif self.menu_mode['status'] == 'level difficalty':
-                    self.map = scene.Map(2*self.menu_mode['number']+1)
+                    self.map = scene.Map(2*self.menu_mode['number'])
                     self.player = player_config.Player(50, scene.win_hight)
+                    self.map.create_map()
                     self.menu_mode['status'] = 'main'
                     self.menu_mode['number'] = 0
                     self.parameter = 'New room'
@@ -65,7 +66,6 @@ class Game():
 
 
     def update_screen(self):
-        self.map.create_map()
         while self.parameter == 'New room':
             self.room = scene.Room(self.map.rooms[self.map.now_location[0]][self.map.now_location[1]])
             self.parameter = 'Play game'
@@ -106,7 +106,7 @@ class Game():
                 else:
                     draw.pip(self.win)
                     if ( abs( self.player.x - scene.win_wight ) < 25 + self.player.size ) and ( abs( self.player.y - scene.win_hight ) < 25 + self.player.size ):
-                        self.room.create_enemies(scene.list_enemies)
+                        self.room.create_enemies(self.room.list_enemies[self.room.number_wave])
 
 
             self.player.health_check(self)
@@ -207,11 +207,23 @@ class Game():
     def save(self):
         if self.parameter == 'Save':
             file = open('save.txt', 'w')
-            file.write(str(1)+'\n')
+            file.write(str(1) + '\n') #факт того, что сохранение существует
             file.write(str(self.player.health) + '\n')
-            file.write(str(0) + '\n')
-            for i in range (0, self.player.taken_items[0] + 1):
-                file.write(str(self.player.taken_items[i]) + '\n')
+            file.write(str(len(self.player.taken_items)) + '\n')
+            for item in self.player.taken_items:
+                file.write(str(item) + '\n')
+            file.write(str(self.map.now_location[0]) + '\n')
+            file.write(str(self.map.now_location[1]) + '\n')
+            file.write(str(self.player.x) + '\n')
+            file.write(str(self.player.y) + '\n')
+            for i in range (0, self.map.max_map_size):
+                for j in range (0, self.map.max_map_size):
+                    room = self.map.rooms[i][j]
+                    file.write( room['status']+ '\n')
+                    file.write( str(room['enemies'][0]) + '\n')
+                    for k in range (0, room['enemies'][0]):
+                        for l in range (0, 5):
+                            file.write( str(room['enemies'][k+1][l]) + '\n')
             file.close()
             self.parameter = 'Menu'
         elif  self.parameter == 'Menu':
@@ -223,11 +235,28 @@ class Game():
         self.save_status = int(file.readline())
         if self.save_status == 1 and self.parameter == 'New room':
             self.player.health = int( file.readline() )
+            lenght =  int( file.readline() ) 
+            for i in range (0, lenght):
+                self.player.get_item(scene.list_items[int( file.readline())])
+            self.map.now_location[0] = int(file.readline())
+            self.map.now_location[1] = int(file.readline())
+            self.player.x = int(file.readline())
+            self.player.y = int(file.readline())
+            for i in range (0, self.map.max_map_size):
+                for j in range (0, self.map.max_map_size):
+                    self.map.rooms[i][j]['status'] = file.readline().replace('\n','')
+                    self.map.rooms[i][j]['enemies'] = [0]
+                    self.map.rooms[i][j]['enemies'][0] = int(file.readline())
+                    for k in range (0, self.map.rooms[i][j]['enemies'][0]):
+                        self.map.rooms[i][j]['enemies'].append([0, 0, 0, 0, 0])
+                        for l in range (0, 5):
+                            self.map.rooms[i][j]['enemies'][k+1][l] = int(file.readline())
         file.close()
+
 
     def delete_save(self):
         file = open('save.txt', 'w')
-        file.write(0)
+        file.write(str(0))
         file.close()
 
 

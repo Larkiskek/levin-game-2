@@ -182,7 +182,7 @@ def mini_map(win, the_map, x, y):
 		for j in range (0, the_map.max_map_size):
 			if the_map.rooms[i][j]['status'] == 'open':
 				pygame.draw.rect(win, (255, 255, 255), (2*scene.win_wight-5+(i-the_map.max_map_size)*size, 5+j*size, size, size))
-				#win.blit(pygame.font.Font(None, 25).render(str(the_map.rooms[i][j]['difficalty']), 0, (0, 0, 0)), (2*scene.win_wight-280+i*25, 5+j*25))
+				#win.blit(pygame.font.Font(None, 25).render(str(the_map.rooms[i][j]['difficalty']), 0, (0, 0, 0)), (2*scene.win_wight-5+(i-the_map.max_map_size)*size, 5+j*size))
 			elif the_map.rooms[i][j]['status'] == 'GOLD' :
 				pygame.draw.rect(win, (255, 255, 0), (2*scene.win_wight-5+(i-the_map.max_map_size)*size, 5+j*size, size, size))
 			elif the_map.rooms[i][j]['status'] == 'BOSS':

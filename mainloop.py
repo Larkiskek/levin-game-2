@@ -11,42 +11,61 @@ import pictures_name
 class Game():
     def __init__(self):
         self.win = pygame.display.set_mode((2*scene.win_wight, 2*scene.win_hight))
-        self.parameter = 'Menu' # 0 - выход, 1 - игра, 2 - смерть, 3 - вход в комнату
-        self.start_room = 0
-        self.map = scene.Map()
+        self.parameter = 'Menu' 
+        self.difficalty = 3
+        self.map = scene.Map(3)
+        self.menu_mode = dict(status = 'main', number = 0)
 
     def menu(self):
         time_delay = 50
-        menu_mode = 0
+        self.load_save()
+        self.menu_mode['save?'] = self.save_status
+        if self.save_status == 0:
+            self.menu_mode['number'] = 1
+        self.menu_mode['number'] = 0
         while self.parameter == 'Menu':
             pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
-            draw.menu(self.win, menu_mode)
+            draw.menu(self.win, self.menu_mode)
             if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_DOWN]):
-                menu_mode = ( menu_mode + 1 )%2
-                time_delay = 30
+                self.menu_mode['number'] = ( self.menu_mode['number'] + 1 )%3
+                time_delay = 20
             if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_UP]):
-                menu_mode = ( menu_mode - 1 )%2
-                time_delay = 30
+                self.menu_mode['number'] = ( self.menu_mode['number'] - 1 )%3
+                time_delay = 20
             if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_RETURN]):
-                self.parameter = 'Restart'
-                self.player = player_config.Player(50, scene.win_hight)
-                if menu_mode == 0:
-                    self.load_save()
+                time_delay = 30
+                if self.menu_mode['status'] == 'main':
+                    if (self.menu_mode['number'] == 0) and self.save_status == 1:
+                        self.player = player_config.Player(50, scene.win_hight)
+                        self.parameter = 'New room'
+                        self.load_save()
+                    elif self.menu_mode['number'] == 1:
+                        self.menu_mode['status'] = 'level difficalty'
+                        self.menu_mode['number'] = 0
+                    elif self.menu_mode['number'] == 2:
+                        self.parameter = 'Exit'
+                elif self.menu_mode['status'] == 'level difficalty':
+                    self.map = scene.Map(2*self.menu_mode['number']+1)
+                    self.player = player_config.Player(50, scene.win_hight)
+                    self.menu_mode['status'] = 'main'
+                    self.menu_mode['number'] = 0
                     self.parameter = 'New room'
             if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_ESCAPE]):
-                self.parameter = 'Exit'
+                time_delay = 30
+                if self.menu_mode['status'] == 'main':
+                    self.parameter = 'Exit'
+                else:
+                    self.menu_mode['status'] = 'main'
             if time_delay > 0:
                 time_delay -= 1
             pygame.display.update()
 
+
     def update_screen(self):
         self.map.create_map()
-        if self.parameter == 'Restart':
-            self.start_room = 0
-            self.parameter = 'New room'
         while self.parameter == 'New room':
             self.room = scene.Room(self.map.rooms[self.map.now_location[0]][self.map.now_location[1]])
             self.parameter = 'Play game'
@@ -64,7 +83,7 @@ class Game():
             self.player.damage()
     
 
-            draw.room(self.win, self.map)                  #рисуем локацию
+            draw.room(self.win, self.map, self.player.x, self.player.y)                  #рисуем локацию
             draw.draw_player(self.win, self.player)
 
 
@@ -78,6 +97,8 @@ class Game():
 
             if self.room.time_before_create > 0:
                 self.room.time_before_create -= 1
+            if self.map.mini_map_time > 0:
+                self.map.mini_map_time -= 1
             if len(self.room.tarakanS) == 0:
                 if self.room.number_wave > self.room.list_enemies[0]:
                     self.parameter = 'Exit room'
@@ -104,7 +125,7 @@ class Game():
                     exit()
             self.actions()
 
-            draw.room(self.win, self.map)                  #рисуем локацию
+            draw.room(self.win, self.map, self.player.x, self.player.y)                  #рисуем локацию
             draw.draw_player(self.win, self.player)
 
             draw.gate(self.win, self.room.gate.coordinates, self.map)
@@ -112,8 +133,10 @@ class Game():
             self.room.items_check(self.player, self.map.rooms[self.map.now_location[0]][self.map.now_location[1]])
             draw.items(self.win, self.room.items)
 
-            self.player.damage()
 
+            self.player.damage()
+            if self.map.mini_map_time > 0:
+                self.map.mini_map_time -= 1
             pygame.display.update()
 
 
@@ -153,6 +176,11 @@ class Game():
         if keys[pygame.K_ESCAPE]:
             self.parameter = 'Save' 
 
+        if keys[pygame.K_TAB]:
+            if self.map.mini_map_time == 0:
+                self.map.mini_map_time = 30
+                self.map.mini_map = -self.map.mini_map
+
     def title_death(self):
         while self.parameter == 'Death':
             pygame.time.delay(10)
@@ -179,6 +207,7 @@ class Game():
     def save(self):
         if self.parameter == 'Save':
             file = open('save.txt', 'w')
+            file.write(str(1)+'\n')
             file.write(str(self.player.health) + '\n')
             file.write(str(0) + '\n')
             for i in range (0, self.player.taken_items[0] + 1):
@@ -188,17 +217,17 @@ class Game():
         elif  self.parameter == 'Menu':
             self.delete_save()
 
+
     def load_save(self):
         file = open('save.txt', 'r')
-        self.player.health = int( file.readline() )
-        self.start_room = int( file.readline() )
+        self.save_status = int(file.readline())
+        if self.save_status == 1 and self.parameter == 'New room':
+            self.player.health = int( file.readline() )
         file.close()
 
     def delete_save(self):
         file = open('save.txt', 'w')
-        file.write(str(self.player.max_health) + '\n')
-        file.write(str(0) + '\n')
-        file.write(str(0) + '\n')
+        file.write(0)
         file.close()
 
 

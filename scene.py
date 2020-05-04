@@ -42,13 +42,15 @@ win_hight = 500
 
 
 class Map():
-	def __init__ (self):
+	def __init__ (self, diff):
 		self.max_map_size = 11
 		self.rooms = []
 		self.now_location = [(self.max_map_size // 4)*2+1, (self.max_map_size // 4)*2+1]
 		self.the_way = []
 		self.next_room = [[1,0],[-1,0],[0,1],[0,-1]]
-		self.gold = 0
+		self.level = diff
+		self.mini_map = 1
+		self.mini_map_time = 0
 
 	def create_map(self):
 		self.create_lattice()
@@ -73,7 +75,6 @@ class Map():
 				else:
 					self.rooms[i][j]= dict(status = 'maybe open')
 		self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'open'
-		self.rooms[self.now_location[0]][self.now_location[1]]['difficalty'] = 0
 
 
 	def add_room(self, name):
@@ -95,7 +96,6 @@ class Map():
 						neighbors += 1
 				if neighbors == 1:
 					self.rooms[self.now_location[0]][self.now_location[1]]['status'] = name
-					self.gold +=1
 					self.the_way = []	
 					break
 				else:
@@ -104,9 +104,9 @@ class Map():
 	def create_the_next_room(self):
 		delta = random.randint(0,3)
 		self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'open'
+		self.rooms[self.now_location[0]][self.now_location[1]]['difficalty'] = -1
 		while self.rooms[self.now_location[0]+self.next_room[delta][0]][self.now_location[1]+self.next_room[delta][1]]['status'] == 'close':
 			delta = random.randint(0,3)
-		self.rooms[self.now_location[0]+self.next_room[delta][0]][self.now_location[1]+self.next_room[delta][1]]['difficalty'] = self.rooms[self.now_location[0]][self.now_location[1]]['difficalty'] + 1
 		self.now_location[0] += self.next_room[delta][0]
 		self.now_location[1] += self.next_room[delta][1]
 		self.the_way.append(delta)
@@ -119,10 +119,13 @@ class Map():
 			self.now_location[1] -= self.next_room[delta][1]
 			self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'maybe open'
 		self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'open'
-		self.the_way = []
+		self.the_way = []	
+
 
 	def closing(self):
 		self.now_location = [(self.max_map_size // 4)*2+1, (self.max_map_size // 4)*2+1]
+		self.rooms[self.now_location[0]][self.now_location[1]]['difficalty'] = self.level
+		self.difficalty(self.now_location[0], self.now_location[1])
 		for i in range (0, self.max_map_size):
 			for j in range (0, self.max_map_size):
 				if self.rooms[i][j]['status'] == 'maybe open':
@@ -142,7 +145,12 @@ class Map():
 		self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'open'
 		self.rooms[self.now_location[0]][self.now_location[1]]['enemies'][0] = 0
 
-
+	def difficalty(self, x, y):
+		for i in range (0, 4):
+			if self.rooms[x+self.next_room[i][0]][y+self.next_room[i][1]]['status'] == 'open':
+				if self.rooms[x+self.next_room[i][0]][y+self.next_room[i][1]]['difficalty'] == -1:
+					self.rooms[x+self.next_room[i][0]][y+self.next_room[i][1]]['difficalty'] = self.rooms[x][y]['difficalty'] + 1
+					self.difficalty(x+self.next_room[i][0], y+self.next_room[i][1])	
 
 	
 		
@@ -194,7 +202,7 @@ class Room():
 							#   name      №    S   HP   LD   LCD   LR   BD  BCD  BS 
 							#   default	       7    3    5    1   100   30   30   5
 							['LAZER UP',  0, ( 0,   0,   0,   1,    0,   0,   0,  0  ) ],
-							['SPEED UP',  1, ( 1,   0,   0,   0,    0,   0,   0,  0  ) ],
+							['SPEED UP',  1, ( 5,   0,   0,   0,    0,   0,   0,  0  ) ],
 							['BULLET UP', 2, ( 0,   2,   0,   0,    0,   0,   3,  0  ) ],
 							['LAZER UP',  3, ( 0,   1,   2,   1,    0,   0,   0,  0  ) ],
 							['SPEED UP',  4, ( 0,   0,   0,   0,    0,   7,   2,  1  ) ],

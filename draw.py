@@ -9,6 +9,7 @@ def draw_player(win, player):
 	HP(win, player)
 	bullet(win, player)
 	CD(win, player)
+	stats(win, player)
 
     
 def tarakan(win, tarakan):
@@ -48,10 +49,28 @@ def bullet(win, player):
 		pygame.draw.rect(win, (0, 0, 255), (bullet.x - bullet.size, bullet.y - bullet.size, 2*bullet.size, 2*bullet.size))
 		win.blit(pictures_name.bullet, pictures_name.bullet.get_rect(center = bullet.coordinates))
 	
+def stats(win, player):
+	win.blit(pygame.font.Font(None, 30).render('SPEED:', 0, (0, 0, 0)), (5, 2*scene.win_hight-200))
+	win.blit(pygame.font.Font(None, 30).render(str(player.speed), 0, (0, 0, 0)), (150, 2*scene.win_hight-200))
+	if player.weapon == 1:
+		win.blit(pygame.font.Font(None, 30).render('DAMAGE:', 0, (180, 0, 0)), (5, 2*scene.win_hight-180))
+		win.blit(pygame.font.Font(None, 30).render(str(player.lazer_characters['damage']), 0, (0, 0, 0)), (150, 2*scene.win_hight-180))
+		win.blit(pygame.font.Font(None, 30).render('CD:', 0, (180, 0, 0)), (5, 2*scene.win_hight-160))
+		win.blit(pygame.font.Font(None, 30).render(str(player.rate_of_lazer_fire), 0, (0, 0, 0)), (150, 2*scene.win_hight-160))
+		win.blit(pygame.font.Font(None, 30).render('RANGE:', 0, (180, 0, 0)), (5, 2*scene.win_hight-140))
+		win.blit(pygame.font.Font(None, 30).render(str(player.lazer_characters['lenght']), 0, (0, 0, 0)), (150, 2*scene.win_hight-140))
+	else:
+		win.blit(pygame.font.Font(None, 30).render('DAMAGE:', 0, (0, 0, 180)), (5, 2*scene.win_hight-180))
+		win.blit(pygame.font.Font(None, 30).render(str(player.bullet_characters['damage']), 0, (0, 0, 0)), (150, 2*scene.win_hight-180))
+		win.blit(pygame.font.Font(None, 30).render('CD:', 0, (0, 0, 180)), (5, 2*scene.win_hight-160))
+		win.blit(pygame.font.Font(None, 30).render(str(player.shoot_cd_max), 0, (0, 0, 0)), (150, 2*scene.win_hight-160))
+		win.blit(pygame.font.Font(None, 30).render('SPEED:', 0, (0, 0, 180)), (5, 2*scene.win_hight-140))
+		win.blit(pygame.font.Font(None, 30).render(str(player.bullet_characters['speed']), 0, (0, 0, 0)), (150, 2*scene.win_hight-140))
 
-def room(win, the_map):
+
+def room(win, the_map, x, y):
 	win.fill((240, 255 ,255))
-	mini_map(win, the_map)
+	mini_map(win, the_map, x, y)
 	#win.blit(pictures_name.rooms[number], pictures_name.rooms[number].get_rect(center = (scene.win_wight, scene.win_hight)))
 
 def gate(win, coordinates, the_map):
@@ -62,13 +81,41 @@ def gate(win, coordinates, the_map):
 def menu(win, mode):
 	win.fill((255, 140 , 0))
 	pygame.font.init()
-	win.blit(pygame.font.Font(None, 100).render('MENU', 1, (180, 0, 0)), (400, 50))
-	if mode == 0:
-		win.blit(pygame.font.Font(None, 50).render('Continue', 1, (255, 255, 0)), (400, 700))
-		win.blit(pygame.font.Font(None, 50).render('New game', 1, (180, 0, 0)), (400, 750))
-	else :
-		win.blit(pygame.font.Font(None, 50).render('Continue', 1, (180, 0, 0)), (400, 700))
-		win.blit(pygame.font.Font(None, 50).render('New game', 1, (255, 255, 0)), (400, 750))
+	win.blit(pygame.font.Font(None, 100).render('MENU', 1, (180, 0, 0)), (405, 50))
+	if mode['status'] == 'main':
+		if mode['number'] == 0:
+			win.blit(pygame.font.Font(None, 50).render('New game', 1, (180, 0, 0)), (410, 750))
+			win.blit(pygame.font.Font(None, 50).render('Exit', 1, (180, 0, 0)), (455, 800))
+		elif mode['number'] == 1:
+			win.blit(pygame.font.Font(None, 50).render('New game', 1, (255, 255, 0)), (410, 750))
+			win.blit(pygame.font.Font(None, 50).render('Exit', 1, (180, 0, 0)), (455, 800))
+		else :
+			win.blit(pygame.font.Font(None, 50).render('New game', 1, (180, 0, 0)), (410, 750))
+			win.blit(pygame.font.Font(None, 50).render('Exit', 1, (255, 255, 0)), (455, 800))
+		if mode['save?'] == 1:
+			if mode['number'] == 0:
+				win.blit(pygame.font.Font(None, 50).render('Continue', 1, (255, 255, 0)), (415, 700))
+			else :
+				win.blit(pygame.font.Font(None, 50).render('Continue', 1, (180, 0, 0)), (415, 700))
+		else :
+			win.blit(pygame.font.Font(None, 50).render('Continue', 1, (84, 84, 82)), (415, 700))
+
+	else:
+		win.blit(pygame.font.Font(None, 60).render('Difficulty select', 1, (180, 0, 0)), (350, 600))
+		if mode['number'] == 0:
+			win.blit(pygame.font.Font(None, 50).render('I am to young to die', 1, (255, 255, 0)), (350, 700))
+			win.blit(pygame.font.Font(None, 50).render('Hurt me plenty', 1, (180, 0, 0)), (385, 750))
+			win.blit(pygame.font.Font(None, 50).render('Nightmare', 1, (180, 0, 0)), (415, 800))
+		elif mode['number'] == 1:
+			win.blit(pygame.font.Font(None, 50).render('I am to young to die', 1, (180, 0, 0)), (350, 700))
+			win.blit(pygame.font.Font(None, 50).render('Hurt me plenty', 1, (255, 255, 0)), (385, 750))
+			win.blit(pygame.font.Font(None, 50).render('Nightmare', 1, (180, 0, 0)), (415, 800))
+		else :
+			win.blit(pygame.font.Font(None, 50).render('I am to young to die', 1, (180, 0, 0)), (350, 700))
+			win.blit(pygame.font.Font(None, 50).render('Hurt me plenty', 1, (180, 0, 0)), (385, 750))
+			win.blit(pygame.font.Font(None, 50).render('Nightmare', 1, (255, 255, 0)), (415, 800))
+
+
 	#win.blit(pictures_name.menu, pictures_name.menu.get_rect(center = (scene.win_wight, scene.win_hight)))
 
 def title_victory(win):
@@ -126,18 +173,23 @@ def head(win, player):
 	if player.lazer.status == 'ON':
 		win.blit(pictures_name.azazel_head[player.lazer.direction][8], pictures_name.azazel_head[player.lazer.direction][8].get_rect(center = (player.x, player.y-30)))		
 
-def mini_map(win, the_map):
+def mini_map(win, the_map, x, y):
+	if the_map.mini_map == 1:
+		size = 25
+	else :
+		size = 15
 	for i in range (0, the_map.max_map_size):
 		for j in range (0, the_map.max_map_size):
 			if the_map.rooms[i][j]['status'] == 'open':
-				pygame.draw.rect(win, (255, 255, 255), (2*scene.win_wight-170+i*15, 5+j*15, 15, 15))
+				pygame.draw.rect(win, (255, 255, 255), (2*scene.win_wight-5+(i-the_map.max_map_size)*size, 5+j*size, size, size))
+				#win.blit(pygame.font.Font(None, 25).render(str(the_map.rooms[i][j]['difficalty']), 0, (0, 0, 0)), (2*scene.win_wight-280+i*25, 5+j*25))
 			elif the_map.rooms[i][j]['status'] == 'GOLD' :
-				pygame.draw.rect(win, (255, 255, 0), (2*scene.win_wight-170+i*15, 5+j*15, 15, 15))
+				pygame.draw.rect(win, (255, 255, 0), (2*scene.win_wight-5+(i-the_map.max_map_size)*size, 5+j*size, size, size))
 			elif the_map.rooms[i][j]['status'] == 'BOSS':
-				pygame.draw.rect(win, (0, 0, 0), (2*scene.win_wight-170+i*15, 5+j*15, 15, 15))
+				pygame.draw.rect(win, (0, 0, 0), (2*scene.win_wight-5+(i-the_map.max_map_size)*size, 5+j*size, size, size))
 			else:
-				pygame.draw.rect(win, (200, 200, 200), (2*scene.win_wight-170+i*15, 5+j*15, 15, 15))
-	pygame.draw.rect(win, (255, 0, 0), (2*scene.win_wight-170+the_map.now_location[0]*15+5, 5+the_map.now_location[1]*15+5, 5, 5))
+				pygame.draw.rect(win, (200, 200, 200), (2*scene.win_wight-5+(i-the_map.max_map_size)*size, 5+j*size, size, size))
+	pygame.draw.rect(win, (255, 0, 0), (2*scene.win_wight-5+(the_map.now_location[0]-the_map.max_map_size)*size + (x-40)*size//(2*scene.win_wight), the_map.now_location[1]*size+5+(y-200)*size//(2*scene.win_hight), 5, 5))
 
 
 	#head = pictures_name.azazel_body[player.direction]

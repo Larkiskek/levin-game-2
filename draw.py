@@ -25,16 +25,16 @@ def HP(win, player):
 		win.blit(pictures_name.health, pictures_name.health.get_rect(center = (20 + 30*i, 20)))
 
 def CD(win, player):
-	pygame.draw.rect(win, (255, 0, 0), (2*scene.win_wight-200, 10, 150, 30), 3)
+	pygame.draw.rect(win, (255, 0, 0), (10, 45, 150, 30), 3)
 	if player.td >= player.cd_max:
-		pygame.draw.rect(win, (255, 0, 0), (2*scene.win_wight-200, 10, 150, 30))
+		pygame.draw.rect(win, (255, 0, 0), (10, 45, 150, 30))
 	elif player.td < player.cd_max:
 		L = 150*player.td / player.cd_max
-		pygame.draw.rect(win, (255, 0, 0), (2*scene.win_wight-200, 10, L, 30)) 
+		pygame.draw.rect(win, (255, 0, 0), (10, 45, L, 30)) 
 	if player.weapon == 1:
-		win.blit(pygame.font.Font(None, 30).render('LAZER', 1, (180, 0, 0)), (2*scene.win_wight-200, 50))
+		win.blit(pygame.font.Font(None, 30).render('LAZER', 1, (180, 0, 0)), (10, 80))
 	else :
-		win.blit(pygame.font.Font(None, 30).render('BULLETS', 1, (0, 0, 180)), (2*scene.win_wight-200, 50))
+		win.blit(pygame.font.Font(None, 30).render('BULLETS', 1, (0, 0, 180)), (10, 80))
 
 
 
@@ -49,13 +49,15 @@ def bullet(win, player):
 		win.blit(pictures_name.bullet, pictures_name.bullet.get_rect(center = bullet.coordinates))
 	
 
-def room(win, number):
+def room(win, the_map):
 	win.fill((240, 255 ,255))
+	mini_map(win, the_map)
 	#win.blit(pictures_name.rooms[number], pictures_name.rooms[number].get_rect(center = (scene.win_wight, scene.win_hight)))
 
-def gate(win, coordinates):
-	pygame.draw.rect(win, (255, 215 , 0), coordinates )
-
+def gate(win, coordinates, the_map):
+	for j in range (0, 4):
+		if the_map.rooms[the_map.now_location[0]+the_map.next_room[j][0]][the_map.now_location[1]+the_map.next_room[j][1]]['status'] != 'close':
+			pygame.draw.rect(win, (255, 215 , 0), coordinates[j])
 
 def menu(win, mode):
 	win.fill((255, 140 , 0))
@@ -126,11 +128,16 @@ def head(win, player):
 
 def mini_map(win, the_map):
 	for i in range (0, the_map.max_map_size):
-			for j in range (0, the_map.max_map_size):
-				if the_map.rooms[i][j]['status'] == 'close':
-					pygame.draw.rect(win, (255, 255, 255), (2*scene.win_wight-200+i*15, 50+j*15, 15, 15))
-				else :
-					pygame.draw.rect(win, (0, 0, 0), (2*scene.win_wight-200+i*15, 50+j*15, 15, 15))
+		for j in range (0, the_map.max_map_size):
+			if the_map.rooms[i][j]['status'] == 'open':
+				pygame.draw.rect(win, (255, 255, 255), (2*scene.win_wight-170+i*15, 5+j*15, 15, 15))
+			elif the_map.rooms[i][j]['status'] == 'GOLD' :
+				pygame.draw.rect(win, (255, 255, 0), (2*scene.win_wight-170+i*15, 5+j*15, 15, 15))
+			elif the_map.rooms[i][j]['status'] == 'BOSS':
+				pygame.draw.rect(win, (0, 0, 0), (2*scene.win_wight-170+i*15, 5+j*15, 15, 15))
+			else:
+				pygame.draw.rect(win, (200, 200, 200), (2*scene.win_wight-170+i*15, 5+j*15, 15, 15))
+	pygame.draw.rect(win, (255, 0, 0), (2*scene.win_wight-170+the_map.now_location[0]*15+5, 5+the_map.now_location[1]*15+5, 5, 5))
 
 
 	#head = pictures_name.azazel_body[player.direction]

@@ -13,6 +13,7 @@ class Game():
         self.win = pygame.display.set_mode((2*scene.win_wight, 2*scene.win_hight))
         self.parameter = 'Menu' # 0 - выход, 1 - игра, 2 - смерть, 3 - вход в комнату
         self.start_room = 0
+        self.map = scene.Map()
 
     def menu(self):
         time_delay = 50
@@ -42,15 +43,13 @@ class Game():
             pygame.display.update()
 
     def update_screen(self):
+        self.map.create_map()
         if self.parameter == 'Restart':
             self.start_room = 0
             self.parameter = 'New room'
-        for i in range (self.start_room, 5):
-            if self.parameter == 'New room':
-                self.room = scene.Room(i)
-                self.parameter = 'Play game'
-            else: 
-                break
+        while self.parameter == 'New room':
+            self.room = scene.Room(self.map.rooms[self.map.now_location[0]][self.map.now_location[1]])
+            self.parameter = 'Play game'
             self.play()
             self.exit_room()
 
@@ -65,7 +64,7 @@ class Game():
             self.player.damage()
     
 
-            draw.room(self.win, self.room.number)                  #рисуем локацию
+            draw.room(self.win, self.map)                  #рисуем локацию
             draw.draw_player(self.win, self.player)
 
 
@@ -81,7 +80,8 @@ class Game():
                 self.room.time_before_create -= 1
             if len(self.room.tarakanS) == 0:
                 if self.room.number_wave > self.room.list_enemies[0]:
-                    self.parameter = 'Items' 
+                    self.parameter = 'Exit room'
+                    self.room.list_enemies[0] = 0
                 else:
                     draw.pip(self.win)
                     if ( abs( self.player.x - scene.win_wight ) < 25 + self.player.size ) and ( abs( self.player.y - scene.win_hight ) < 25 + self.player.size ):
@@ -93,21 +93,23 @@ class Game():
 
 
     def exit_room(self):
-        if self.parameter == 'Items':
+        if self.parameter == 'Exit room' and self.room.status == 'BOSS' :
+            self.parameter = 'Victory'
+        if self.parameter == 'Exit room' and self.room.status == 'GOLD' :
             self.room.create_items()
-        while self.parameter == 'Items':
+        while self.parameter == 'Exit room':
             pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
             self.actions()
 
-            draw.room(self.win, self.room.number)                  #рисуем локацию
+            draw.room(self.win, self.map)                  #рисуем локацию
             draw.draw_player(self.win, self.player)
 
-            draw.gate(self.win, self.room.gate.coordinates)
+            draw.gate(self.win, self.room.gate.coordinates, self.map)
             self.room.gate.input(self)
-            self.room.items_check(self.player)
+            self.room.items_check(self.player, self.map.rooms[self.map.now_location[0]][self.map.now_location[1]])
             draw.items(self.win, self.room.items)
 
             self.player.damage()
@@ -164,7 +166,7 @@ class Game():
 
 
     def title_victory(self):
-        while self.parameter == 'New room':
+        while self.parameter == 'Victory':
             pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -178,7 +180,7 @@ class Game():
         if self.parameter == 'Save':
             file = open('save.txt', 'w')
             file.write(str(self.player.health) + '\n')
-            file.write(str(self.room.number) + '\n')
+            file.write(str(0) + '\n')
             for i in range (0, self.player.taken_items[0] + 1):
                 file.write(str(self.player.taken_items[i]) + '\n')
             file.close()

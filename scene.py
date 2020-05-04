@@ -2,13 +2,13 @@ import draw
 from tarakan import Tarakan as T
 import random
 import player_config
+import math
 
 import pygame
 
 list_enemies = []
 list_enemies.append([
-0,
-[0, 0, 0, 0, 0]
+0
 ])
 #первая комната
 list_enemies.append([
@@ -55,6 +55,8 @@ class Map():
 		for i in range (0, 3):
 			self.add_room('GOLD')
 		self.add_room('BOSS')
+		self.closing()
+
 
 
 	def create_lattice(self):
@@ -71,6 +73,7 @@ class Map():
 				else:
 					self.rooms[i][j]= dict(status = 'maybe open')
 		self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'open'
+		self.rooms[self.now_location[0]][self.now_location[1]]['difficalty'] = 0
 
 
 	def add_room(self, name):
@@ -81,7 +84,7 @@ class Map():
 				self.now_location[0] = random.randint(1, self.max_map_size-1)
 				self.now_location[1] = random.randint(1, self.max_map_size-1)
 			for j in range (0, 3):
-				self.move_to_the_next_room() 
+				self.create_the_next_room() 
 				if self.rooms[self.now_location[0]][self.now_location[1]]['status'] != 'maybe open':
 					self.welcome_back()
 					break
@@ -98,11 +101,12 @@ class Map():
 				else:
 					self.welcome_back()
 
-	def move_to_the_next_room(self):
+	def create_the_next_room(self):
 		delta = random.randint(0,3)
 		self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'open'
 		while self.rooms[self.now_location[0]+self.next_room[delta][0]][self.now_location[1]+self.next_room[delta][1]]['status'] == 'close':
 			delta = random.randint(0,3)
+		self.rooms[self.now_location[0]+self.next_room[delta][0]][self.now_location[1]+self.next_room[delta][1]]['difficalty'] = self.rooms[self.now_location[0]][self.now_location[1]]['difficalty'] + 1
 		self.now_location[0] += self.next_room[delta][0]
 		self.now_location[1] += self.next_room[delta][1]
 		self.the_way.append(delta)
@@ -116,13 +120,38 @@ class Map():
 			self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'maybe open'
 		self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'open'
 		self.the_way = []
+
+	def closing(self):
+		self.now_location = [(self.max_map_size // 4)*2+1, (self.max_map_size // 4)*2+1]
+		for i in range (0, self.max_map_size):
+			for j in range (0, self.max_map_size):
+				if self.rooms[i][j]['status'] == 'maybe open':
+					self.rooms[i][j]['status'] = 'close'
+				if self.rooms[i][j]['status'] == 'open':
+					diff = self.rooms[i][j]['difficalty']
+					self.rooms[i][j]['enemies']= [1, 
+						[random.randint(0, 2*diff),
+						random.randint(0, diff//2),
+						random.randint(0, diff//3),
+						random.randint(0, diff//3),
+						0]]
+				elif self.rooms[i][j]['status'] == 'BOSS':
+					self.rooms[i][j]['enemies'] = [1, [0, 0, 0, 0, 1]]
+				else :
+					self.rooms[i][j]['enemies'] = [0]
+		self.rooms[self.now_location[0]][self.now_location[1]]['status'] = 'open'
+		self.rooms[self.now_location[0]][self.now_location[1]]['enemies'][0] = 0
+
+
+
+	
 		
 
 
 	def print_map(self):
 		for i in range (0, self.max_map_size):
 			for j in range (0, self.max_map_size):
-				print(self.rooms[i][j]['status'])
+				print(self.rooms[i][j]['status'], self.rooms[i][j]['enemies'])
 			print('\n')
 
 
@@ -138,17 +167,17 @@ class Map():
 
 
 class Room():
-	def __init__ (self, i):
-		self.number = i
+	def __init__ (self, data):
 		self.gate = Gate()
 		self.time_before_create_max = 50
 		self.time_before_create = 2*self.time_before_create_max
 
 		self.number_wave = 1
-		self.list_enemies = list_enemies[self.number]
+		self.list_enemies = data['enemies']
 		self.enemy = Enemies()
 		self.tarakanS = []
 		self.items = []
+		self.status = data['status']
 
 	def create_enemies(self, list_enemies):
 			self.enemy.generate(self.list_enemies[self.number_wave])
@@ -179,7 +208,7 @@ class Room():
 			self.items.append(item)
 			del self.list_items[number]
 
-	def items_check(self, player):
+	def items_check(self, player, room):
 		for item in self.items:
 			x = item[3][0]
 			y = item[3][1]
@@ -198,6 +227,7 @@ class Room():
 				player.bullet_characters['speed'] += item[2][7]
 				self.items = []
 				player.lazer = player_config.Lazer(player)
+				room['status'] = 'open'
 
 
 
@@ -205,14 +235,31 @@ class Gate():
 	def __init__ (self):
 		self.size = 100 
 		self.wight = 10
-		self.coordinates = (0, 500-self.size, 2*self.wight, 2*self.size)
+		self.coordinates = [
+			(2*win_wight -10, win_hight-self.size, 2*self.wight, 2*self.size ),
+			(10, win_hight-self.size, 2*self.wight, 2*self.size),
+			(win_wight-self.size, 2*win_hight-50, 2*self.size, 2*self.wight),
+			(win_wight-self.size, 50, 2*self.size, 2*self.wight)]
+
 		self.victory = 0
 
 	def input(self, game):
-		self.coordinates = (2*win_wight -10 -self.wight, win_hight-self.size, 2*self.wight, 2*self.size )
-		if ( game.player.x + game.player.size >= 2*win_wight -10 ) and ( game.player.y + game.player.size - self.size < win_hight ) and ( game.player.y - game.player.size + self.size > win_hight ):
+		if ( game.player.x + game.player.size >= 2*win_wight -10 ) and ( abs(game.player.y - win_hight) < self.size - game.player.size ) and (game.map.rooms[game.map.now_location[0]+1][game.map.now_location[1]]['status'] != 'close'):
+			game.map.now_location[0] += 1
+			game.player.x = game.player.size + 50
 			game.parameter = 'New room'
-			game.player.x = game.player.size + 10
+		if ( game.player.x - game.player.size <= 10 ) and ( abs(game.player.y - win_hight) < self.size - game.player.size ) and (game.map.rooms[game.map.now_location[0]-1][game.map.now_location[1]]['status'] != 'close'):
+			game.map.now_location[0] -= 1
+			game.player.x = 2*win_wight- game.player.size - 50
+			game.parameter = 'New room'
+		if ( abs(game.player.x - win_wight) < self.size - game.player.size ) and ( game.player.y + game.player.size >= 2*win_hight -50 ) and (game.map.rooms[game.map.now_location[0]][game.map.now_location[1]+1]['status'] != 'close'):
+			game.map.now_location[1] += 1
+			game.player.y = game.player.size + 150
+			game.parameter = 'New room'
+		if ( abs(game.player.x - win_wight) < self.size - game.player.size ) and ( game.player.y - game.player.size <= 50 ) and (game.map.rooms[game.map.now_location[0]][game.map.now_location[1]-1]['status'] != 'close'):
+			game.map.now_location[1] -= 1
+			game.player.y = 2*win_hight - game.player.size - 150
+			game.parameter = 'New room'
 
 
 class Enemies():
@@ -271,7 +318,7 @@ def test_map():
 		#if pygame.key.get_pressed()[pygame.K_DOWN]:
 			#the_map.welcome_back()
 		pygame.display.update()
-		for i in range (0, 1000):
+		for i in range (0, 10000):
 			pygame.time.delay(10)	
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:

@@ -20,7 +20,8 @@ class Game():
         self.menu_mode['save?'] = self.save_status
         if self.save_status == 0:
             self.menu_mode['number'] = 1
-        self.menu_mode['number'] = 0
+        else:
+            self.menu_mode['number'] = 0
         while self.parameter == 'Menu':
             pygame.time.delay(10)
             for event in pygame.event.get():
@@ -48,7 +49,7 @@ class Game():
                     elif self.menu_mode['number'] == 2:
                         self.parameter = 'Exit'
                 elif self.menu_mode['status'] == 'level difficalty':
-                    self.map = scene.Map(2*self.menu_mode['number'])
+                    self.map = scene.Map(2*self.menu_mode['number']+1)
                     self.player = player_config.Player(50, scene.win_hight)
                     self.map.create_map()
                     self.menu_mode['status'] = 'main'
@@ -62,6 +63,7 @@ class Game():
                     self.menu_mode['status'] = 'main'
             if time_delay > 0:
                 time_delay -= 1
+
             pygame.display.update()
 
 
@@ -73,6 +75,7 @@ class Game():
             self.exit_room()
 
     def play(self):
+        time = pygame.time.get_ticks()
         while self.parameter == 'Play game':
             pygame.time.delay(10)
             for event in pygame.event.get():
@@ -110,10 +113,14 @@ class Game():
 
 
             self.player.health_check(self)
+
+            draw.FPS(self.win, pygame.time.get_ticks()-time)
+            time = pygame.time.get_ticks()
             pygame.display.update()
 
 
     def exit_room(self):
+        time = pygame.time.get_ticks()
         if self.parameter == 'Exit room' and self.room.status == 'BOSS' :
             self.parameter = 'Victory'
         if self.parameter == 'Exit room' and self.room.status == 'GOLD' :
@@ -137,6 +144,9 @@ class Game():
             self.player.damage()
             if self.map.mini_map_time > 0:
                 self.map.mini_map_time -= 1
+
+            draw.FPS(self.win, pygame.time.get_ticks()-time)
+            time = pygame.time.get_ticks()
             pygame.display.update()
 
 

@@ -70,8 +70,8 @@ def stats(win, player):
 
 def room(win, the_map, x, y):
 	win.fill((240, 255 ,255))
+	#win.blit(pictures_name.rooms[0], pictures_name.rooms[0].get_rect(center = (scene.win_wight, scene.win_hight)))
 	mini_map(win, the_map, x, y)
-	#win.blit(pictures_name.rooms[number], pictures_name.rooms[number].get_rect(center = (scene.win_wight, scene.win_hight)))
 
 def gate(win, coordinates, the_map):
 	for j in range (0, 4):
@@ -191,5 +191,7 @@ def mini_map(win, the_map, x, y):
 				pygame.draw.rect(win, (200, 200, 200), (2*scene.win_wight-5+(i-the_map.max_map_size)*size, 5+j*size, size, size))
 	pygame.draw.rect(win, (255, 0, 0), (2*scene.win_wight-5+(the_map.now_location[0]-the_map.max_map_size)*size + (x-40)*size//(2*scene.win_wight), the_map.now_location[1]*size+5+(y-200)*size//(2*scene.win_hight), 5, 5))
 
+def FPS(win, time):
+	win.blit(pygame.font.Font(None, 30).render("fps: " + str(1000//time), 1, (0, 0, 0)), (5, 950))
 
 	#head = pictures_name.azazel_body[player.direction]

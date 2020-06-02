@@ -83,15 +83,6 @@ def menu(win, mode):
 	pygame.font.init()
 	win.blit(pygame.font.Font(None, 100).render('MENU', 1, (180, 0, 0)), (405, 50))
 	if mode['status'] == 'main':
-		if mode['number'] == 0:
-			win.blit(pygame.font.Font(None, 50).render('New game', 1, (180, 0, 0)), (410, 750))
-			win.blit(pygame.font.Font(None, 50).render('Exit', 1, (180, 0, 0)), (455, 800))
-		elif mode['number'] == 1:
-			win.blit(pygame.font.Font(None, 50).render('New game', 1, (255, 255, 0)), (410, 750))
-			win.blit(pygame.font.Font(None, 50).render('Exit', 1, (180, 0, 0)), (455, 800))
-		else :
-			win.blit(pygame.font.Font(None, 50).render('New game', 1, (180, 0, 0)), (410, 750))
-			win.blit(pygame.font.Font(None, 50).render('Exit', 1, (255, 255, 0)), (455, 800))
 		if mode['save?'] == 1:
 			if mode['number'] == 0:
 				win.blit(pygame.font.Font(None, 50).render('Continue', 1, (255, 255, 0)), (415, 700))
@@ -100,7 +91,24 @@ def menu(win, mode):
 		else :
 			win.blit(pygame.font.Font(None, 50).render('Continue', 1, (84, 84, 82)), (415, 700))
 
-	else:
+		if mode['number'] == 1:
+			win.blit(pygame.font.Font(None, 50).render('New game', 1, (255, 255, 0)), (410, 750))
+		else:
+			win.blit(pygame.font.Font(None, 50).render('New game', 1, (180, 0, 0)), (410, 750))
+
+		if mode['number'] == 2:
+			win.blit(pygame.font.Font(None, 50).render('Exit', 1, (255, 255, 0)), (455, 800))
+		else:
+			win.blit(pygame.font.Font(None, 50).render('Exit', 1, (180, 0, 0)), (455, 800))
+
+		if mode['number'] == 3:
+			win.blit(pygame.font.Font(None, 50).render('Online (В разработке)', 1, (255, 255, 0)), (430, 850))
+		else:
+			win.blit(pygame.font.Font(None, 50).render('Online (В разработке)', 1, (180, 0, 0)), (430, 850))
+
+
+
+	elif mode['status'] == 'level difficalty':
 		win.blit(pygame.font.Font(None, 60).render('Difficulty select', 1, (180, 0, 0)), (350, 600))
 		if mode['number'] == 0:
 			win.blit(pygame.font.Font(None, 50).render('I am to young to die', 1, (255, 255, 0)), (350, 700))
@@ -115,6 +123,16 @@ def menu(win, mode):
 			win.blit(pygame.font.Font(None, 50).render('Hurt me plenty', 1, (180, 0, 0)), (385, 750))
 			win.blit(pygame.font.Font(None, 50).render('Nightmare', 1, (255, 255, 0)), (415, 800))
 
+	else:
+		if mode['number'] == 0:
+			win.blit(pygame.font.Font(None, 50).render('Server', 1, (255, 255, 0)), (410, 750))
+		else:
+			win.blit(pygame.font.Font(None, 50).render('Server', 1, (180, 0, 0)), (410, 750))
+
+		if mode['number'] == 1:
+			win.blit(pygame.font.Font(None, 50).render('Client', 1, (255, 255, 0)), (455, 800))
+		else:
+			win.blit(pygame.font.Font(None, 50).render('Client', 1, (180, 0, 0)), (455, 800))
 
 	#win.blit(pictures_name.menu, pictures_name.menu.get_rect(center = (scene.win_wight, scene.win_hight)))
 

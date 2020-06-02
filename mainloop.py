@@ -5,6 +5,7 @@ import tarakan
 import draw
 import math
 import pictures_name
+import online
 
 
 
@@ -13,6 +14,8 @@ class Game():
         self.win = pygame.display.set_mode((2*scene.win_wight, 2*scene.win_hight))
         self.parameter = 'Menu' 
         self.menu_mode = dict(status = 'main', number = 0)
+        self.time = pygame.time.get_ticks()
+        self.online_status = 'streamer'
 
     def menu(self):
         time_delay = 50
@@ -22,19 +25,20 @@ class Game():
             self.menu_mode['number'] = 1
         else:
             self.menu_mode['number'] = 0
+        self.menu_mode['options'] = 4
         while self.parameter == 'Menu':
             pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
             draw.menu(self.win, self.menu_mode)
-            if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_DOWN]):
-                self.menu_mode['number'] = ( self.menu_mode['number'] + 1 )%3
+            if time_delay == 0 and pygame.key.get_pressed()[pygame.K_DOWN]:
+                self.menu_mode['number'] = ( self.menu_mode['number'] + 1 )%self.menu_mode['options']
                 time_delay = 20
-            if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_UP]):
-                self.menu_mode['number'] = ( self.menu_mode['number'] - 1 )%3
+            if time_delay == 0 and pygame.key.get_pressed()[pygame.K_UP]:
+                self.menu_mode['number'] = ( self.menu_mode['number'] - 1 )%self.menu_mode['options']
                 time_delay = 20
-            if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_RETURN]):
+            if time_delay == 0 and pygame.key.get_pressed()[pygame.K_RETURN]:
                 time_delay = 30
                 if self.menu_mode['status'] == 'main':
                     if (self.menu_mode['number'] == 0) and self.save_status == 1:
@@ -45,9 +49,14 @@ class Game():
                         self.load_save()
                     elif self.menu_mode['number'] == 1:
                         self.menu_mode['status'] = 'level difficalty'
+                        self.menu_mode['options'] = 3
                         self.menu_mode['number'] = 0
                     elif self.menu_mode['number'] == 2:
                         self.parameter = 'Exit'
+                    elif self.menu_mode['number'] == 3:
+                        self.menu_mode['status'] = 'online'
+                        self.menu_mode['options'] = 2
+
                 elif self.menu_mode['status'] == 'level difficalty':
                     self.map = scene.Map(2*self.menu_mode['number']+1)
                     self.player = player_config.Player(50, scene.win_hight)
@@ -55,15 +64,36 @@ class Game():
                     self.menu_mode['status'] = 'main'
                     self.menu_mode['number'] = 0
                     self.parameter = 'New room'
-            if (time_delay == 0 and pygame.key.get_pressed()[pygame.K_ESCAPE]):
+
+                elif self.menu_mode['status'] == 'online':
+                    self.menu_mode['status'] = 'main'
+                    if self.menu_mode['number'] == 0:
+                        self.serv = online.Server()
+                        self.map = scene.Map(0)
+                        self.player = player_config.Player(50, scene.win_hight)
+                        self.map.create_map()
+                        self.parameter = 'New room'
+                        self.serv.send_save(self.player, self.map)
+
+                    if self.menu_mode['number'] == 1:
+                        self.serv = online.Client('localhost')
+                        self.map = scene.Map(0)
+                        self.player = player_config.Player(50, scene.win_hight)
+                        self.map.create_map()
+                        self.parameter = 'New room'
+                        self.serv.get_save(self.player, self.map)
+
+
+            if time_delay == 0 and pygame.key.get_pressed()[pygame.K_ESCAPE]:
                 time_delay = 30
                 if self.menu_mode['status'] == 'main':
                     self.parameter = 'Exit'
                 else:
                     self.menu_mode['status'] = 'main'
+                    self.menu_mode['options'] = 4
+
             if time_delay > 0:
                 time_delay -= 1
-
             pygame.display.update()
 
 
@@ -71,12 +101,11 @@ class Game():
         while self.parameter == 'New room':
             self.room = scene.Room(self.map.rooms[self.map.now_location[0]][self.map.now_location[1]])
             self.parameter = 'Play game'
-            self.play()
+            while self.parameter == 'Play game':
+                self.play()
             self.exit_room()
 
     def play(self):
-        time = pygame.time.get_ticks()
-        while self.parameter == 'Play game':
             pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -114,8 +143,8 @@ class Game():
 
             self.player.health_check(self)
 
-            draw.FPS(self.win, pygame.time.get_ticks()-time)
-            time = pygame.time.get_ticks()
+            draw.FPS(self.win, pygame.time.get_ticks()-self.time)
+            self.time = pygame.time.get_ticks()
             pygame.display.update()
 
 

@@ -5,12 +5,12 @@ import pygame
 class Server():
 	def __init__(self):
 		self.status = 'server'
-		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM,  socket.IPPROTO_TCP)
 		self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 		self.sock.bind(('', 9091)) # номер порта ( хост пустой )
 		self.sock.listen(1) # количество подключений
 		(self.conn, self.addr) = self.sock.accept()
-		print( 'connected: ', self.addr)
+		#print( 'connected: ', self.addr)
 
 	def get(self):
 		data = ''
@@ -91,7 +91,7 @@ class Server():
 class Client():
 	def __init__(self, host):
 		self.status = 'client'
-		self.sock = socket.socket()
+		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM,  socket.IPPROTO_TCP)
 		self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 		self.sock.connect((host, 9091))
 

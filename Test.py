@@ -1,6 +1,7 @@
 import pygame
 import pictures_name
 import online
+import socket
 pygame.init()
 
 
@@ -154,9 +155,25 @@ def main():
 
 #main()
 
+class Server():
+	def __init__(self):
+		self.status = 'server'
+		self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,  socket.IPPROTO_UDP)
+		self.sock.bind(('', 9092)) # номер порта ( хост пустой )
+		#self.sock.listen(1) # количество подключений
+		self.conn, self.addr = self.sock.accept()
+		#print( 'connected: ', self.addr)
+
+class Client():
+	def __init__(self):
+		self.status = 'client'
+		self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,  socket.IPPROTO_UDP)
+		self.sock.connect(('localhost', 9092))
+
 if input() == '1':
-	s = online.Server()
+	#s = online.Server()
 	data = 'AUummaqebvevieqvibqbievonbvq'
+	'''
 	time = pygame.time.get_ticks()
 	for i in range (0, 1000):
 		s.conn.send(data.encode())
@@ -170,8 +187,18 @@ if input() == '1':
 	print('2: ', pygame.time.get_ticks()-time)
 
 	s.close()
+	'''
+	s = Server()
+	time = pygame.time.get_ticks()
+	for i in range (0, 1000):
+		s.conn.send(data.encode())
+	print('2: ', pygame.time.get_ticks()-time)
+	s.conn.close()
+
+
 
 else:
+	'''
 	c = online.Client('localhost')
 	time = pygame.time.get_ticks()
 	for i in range (0, 1000):
@@ -183,3 +210,13 @@ else:
 	print('2: ', pygame.time.get_ticks()-time)
 
 	c.close()
+	'''
+	c.Client()
+	time = pygame.time.get_ticks()
+	for i in range (0, 1000):
+		data = c.recvfrom(20).decode()
+	print('1: ', pygame.time.get_ticks()-time)
+	c.close()
+
+
+

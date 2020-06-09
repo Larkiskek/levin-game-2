@@ -14,7 +14,7 @@ class Game():
         self.win = pygame.display.set_mode((2*scene.win_wight, 2*scene.win_hight))
         self.parameter = 'Menu' 
         #тут нужно вернуть норм параметры
-        self.menu_mode = dict(status = 'online', number = 0)
+        self.menu_mode = dict(status = 'main', number = 0)
         self.using_keys = ''
         self.fps = dict(time = 0, delay = 30, value = 0, worst_time = 1)
 
@@ -47,7 +47,7 @@ class Game():
                     if (self.menu_mode['number'] == 0) and self.save_status == 1:
                         self.players_status = 'single'
                         self.map = scene.Map(0, self.players_status)
-                        self.player = player_config.Player(50, scene.win_hight, 3)
+                        self.player = player_config.Player(50, scene.win_hight, 5)
                         self.parameter = 'New room'
                         self.load_save()
                     elif self.menu_mode['number'] == 1:
@@ -63,7 +63,7 @@ class Game():
                 elif self.menu_mode['status'] == 'level difficalty':
                     self.players_status = 'single'
                     self.map = scene.Map(2*self.menu_mode['number']+1, self.players_status)
-                    self.player = player_config.Player(50, scene.win_hight, 3)
+                    self.player = player_config.Player(50, scene.win_hight, 5)
                     self.menu_mode['number'] = 0
                     self.parameter = 'New room'
 
@@ -78,7 +78,7 @@ class Game():
                         self.serv.send_save(self.player, self.map)
 
                     if self.menu_mode['number'] == 1:
-                        self.serv = online.Client(input())
+                        self.serv = online.Client('localhost')
                         self.player2 = player_config.Player(50, scene.win_hight, 5)
                         self.player = player_config.Player(2*scene.win_hight-50, scene.win_hight, 5)
                         self.serv.get_save(self.player2, self.map)
@@ -349,7 +349,7 @@ class Game():
             self.parameter = 'Menu'
         elif  self.parameter == 'Menu':
             self.delete_save()
-        elif self.players_status == 'pair':
+        if self.parameter == 'Save':
             self.parameter = 'Menu'
 
 

@@ -349,7 +349,7 @@ class Game():
             self.parameter = 'Menu'
         elif  self.parameter == 'Menu':
             self.delete_save()
-        else:
+        elif self.players_status == 'pair':
             self.parameter = 'Menu'
 
 

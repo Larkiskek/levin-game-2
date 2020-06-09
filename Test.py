@@ -1,5 +1,6 @@
 import pygame
 import pictures_name
+import online
 pygame.init()
 
 
@@ -130,22 +131,55 @@ def main():
 		None
 	time2 = pygame.time.get_ticks()
 	print('Nothing:        ', time2 - time1)
-	#while True:
-		#pygame.time.delay(10)
-		#for event in pygame.event.get():
-			#if event.type == pygame.QUIT:
-				#exit()
-		#if pygame.key.get_pressed()[pygame.K_d]:
-			#obj.rect.x += 1
-		#if pygame.key.get_pressed()[pygame.K_a]:
-			#obj.rect.x -= 1
-		#if pygame.key.get_pressed()[pygame.K_w]:
-			#obj.rect.y -= 1
-		#if pygame.key.get_pressed()[pygame.K_s]:
-			#obj.rect.y += 1
-		#if pygame.key.get_pressed()[pygame.K_z]:
-			#break
-		#pygame.display.update()
-		#obj.update()
+	'''
+	while True:
+		pygame.time.delay(10)
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				exit()
+		if pygame.key.get_pressed()[pygame.K_d]:
+			obj.rect.x += 1
+		if pygame.key.get_pressed()[pygame.K_a]:
+			obj.rect.x -= 1
+		if pygame.key.get_pressed()[pygame.K_w]:
+			obj.rect.y -= 1
+		if pygame.key.get_pressed()[pygame.K_s]:
+			obj.rect.y += 1
+		if pygame.key.get_pressed()[pygame.K_z]:
+			break
+		pygame.display.update()
+		obj.update()
+	'''
 	print(pygame.time.get_ticks())
-main()
+
+#main()
+
+if input() == '1':
+	s = online.Server()
+	data = 'AUummaqebvevieqvibqbievonbvq'
+	time = pygame.time.get_ticks()
+	for i in range (0, 1000):
+		s.conn.send(data.encode())
+	print('1: ', pygame.time.get_ticks()-time)
+
+	time = pygame.time.get_ticks()
+	data2 = ''
+	for i in range (0, 1000000):
+		data2 += data
+	s.conn.send(data2.encode())
+	print('2: ', pygame.time.get_ticks()-time)
+
+	s.close()
+
+else:
+	c = online.Client('localhost')
+	time = pygame.time.get_ticks()
+	for i in range (0, 1000):
+		data = c.get().decode()
+	print('1: ', pygame.time.get_ticks()-time)
+
+	time = pygame.time.get_ticks()
+	data2 = c.get().decode()
+	print('2: ', pygame.time.get_ticks()-time)
+
+	c.close()

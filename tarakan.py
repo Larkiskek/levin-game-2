@@ -42,18 +42,27 @@ class Tarakan():
     def coordinates(self):
         return (self.x - self.shift_x, self.y-self.shift_y )
 
-    def dinamics(self, player):
-        self.get_damage(player)
-        self.move(player)
+    def close_player(self, players):
+        r = 10000
+        for player in players:
+            player_r = ( (abs(player.x - self.x)+player.size)**2 + (abs(self.y - player.y)+player.size)**2 )**0.5
+            if player_r < r:
+                x = player.x
+                y = player.y
+                r = player_r
+        return (r, x, y)
 
-    def move(self, player):
+
+    def move(self, players):
         if self.stop_move == 0:
-            r = ( (abs(player.x - self.x)+player.size)**2 + (abs(self.y - player.y)+player.size)**2 )**0.5
-            if ( (player.x - self.x)**2 + (self.p*(player.y - self.y))**2 < self.half_wight**2 ):
-                self.stop_move = self.stop_move_max
+            #r = ( (abs(player.x - self.x)+player.size)**2 + (abs(self.y - player.y)+player.size)**2 )**0.5
+            close_player_coordinates = self.close_player(players)
+            r = close_player_coordinates[0]
+            player_x = close_player_coordinates[1]
+            player_y = close_player_coordinates[2]
             self.jump()
-            self.x += self.speed * (player.x - self.x) / r + self.jump_speed_x
-            self.y += self.speed * (player.y - self.y) / r + self.jump_speed_y
+            self.x += int(self.speed * (player_x - self.x) // r) + self.jump_speed_x
+            self.y += int(self.speed * (player_y - self.y) // r) + self.jump_speed_y
         else:
             self.stop_move -= 1
 
@@ -66,13 +75,17 @@ class Tarakan():
             if ( self.x > bullet.x - self.half_wight ) and ( self.y > bullet.y - self.half_hight ) and (  (bullet.x + bullet.size + self.half_wight ) > self.x  ) and (  (bullet.y + bullet.size + self.half_hight) > self.y):
                 self.health -= bullet.damage
                 player.bullets.remove(bullet)
+        if ( (player.x - self.x)**2 + (self.p*(player.y - self.y))**2 < self.half_wight**2 ) and self.stop_move == 0:
+                self.stop_move = self.stop_move_max
+                player.health -= 1
+
 
 
     def jump(self):
         if self.jump_time == self.jump_duration:
             fi = random.random()*2*math.pi
-            self.jump_speed_x = self.jump_speed*math.cos(fi)
-            self.jump_speed_y = self.jump_speed*math.sin(fi)
+            self.jump_speed_x = int(self.jump_speed*math.cos(fi))
+            self.jump_speed_y = int(self.jump_speed*math.sin(fi))
         elif self.jump_time == 0:
             self.jump_speed_x = 0
             self.jump_speed_y = 0

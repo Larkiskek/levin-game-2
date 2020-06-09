@@ -24,21 +24,28 @@ win_hight = 500
 
 
 class Map():
-	def __init__ (self, diff):
-		self.max_map_size = 11
+	def __init__ (self, diff, typ):
+		if typ == 'single':
+			self.max_map_size = 11
+			self.room_types = dict(GOLD = 3, BOSS = 1, distance = 3)
+		else:
+			self.max_map_size = 15
+			self.room_types = dict(GOLD = 5, BOSS = 1, distance = 5)
 		self.rooms = []
 		self.now_location = [(self.max_map_size // 4)*2+1, (self.max_map_size // 4)*2+1]
 		self.the_way = []
 		self.next_room = [[1,0],[-1,0],[0,1],[0,-1]]
 		self.level = diff
 		self.mini_map = -1
-		self.mini_map_time = 0 
+		self.mini_map_time = 0
+		self.create_map()
 
 	def create_map(self):
 		self.create_lattice()
-		for i in range (0, 3):
+		for i in range (0, self.room_types['GOLD']):
 			self.add_room('GOLD')
-		self.add_room('BOSS')
+		for i in range (0, self.room_types['BOSS']):
+			self.add_room('BOSS')
 		self.closing()
 
 
@@ -66,7 +73,7 @@ class Map():
 			while self.rooms[self.now_location[0]][self.now_location[1]]['status'] != 'open':
 				self.now_location[0] = random.randint(1, self.max_map_size-1)
 				self.now_location[1] = random.randint(1, self.max_map_size-1)
-			for j in range (0, 3):
+			for j in range (0, self.room_types['distance']):
 				self.create_the_next_room() 
 				if self.rooms[self.now_location[0]][self.now_location[1]]['status'] != 'maybe open':
 					self.welcome_back()
@@ -170,8 +177,7 @@ class Room():
 		self.status = data['status']
 
 	def create_enemies(self, list_enemies):
-			self.enemy.generate(self.list_enemies[self.number_wave])
-			self.tarakanS = self.enemy.list
+			self.enemy.generate(self.list_enemies[self.number_wave], self.tarakanS)
 			self.number_wave +=1
 
 
@@ -240,9 +246,8 @@ class Enemies():
 		self.BOSS=(  4,    550,   500, 3000,   2.5,    ( 139,  69,19),        0,          500,       0,       0,     30   )
 		self.characters = [self.S, self.M, self.L, self.XL, self.BOSS]
 
-		self.list = []
 
-	def generate(self, set):
+	def generate(self, set, tarakanS):
 		for i in range (0, 5):
 			for j in range (0, set[i]):
 				x = win_wight
@@ -250,6 +255,6 @@ class Enemies():
 				while ((abs(x-win_wight) < 100) and (abs(y-win_hight) < 100)): 
 					x = random.randint(70, (2*win_wight - 70))
 					y = random.randint(170,(2*win_hight - 70))
-				self.list.append( T(x, y, self.characters[i]))
+				tarakanS.append( T(x, y, self.characters[i]))
 
 

@@ -4,7 +4,7 @@ import draw
 import math
 
 class Player():
-    def __init__(self, x, y):
+    def __init__(self, x, y, health):
         self.x = x
         self.y = y 
         self.color = (255, 0 , 0)
@@ -21,7 +21,7 @@ class Player():
         self.lazer_characters = {'lenght':80, 'wight':25, 'damage':5}
         self.bullet_characters = {'speed': 5,'damage': 30}
 
-        self.max_health = 3
+        self.max_health = health
         self.health = self.max_health
 
         self.weapon = 1
@@ -131,9 +131,11 @@ class Player():
             self.weapon = -self.weapon
             self.time_weapon = 10
 
+    '''
     def get_damage(self, tarakan):
         if tarakan.stop_move == (tarakan.stop_move_max - 1) :
             self.health -= 1
+    '''
 
     def health_check(self, game):
         if self.health <= 0:
@@ -152,6 +154,23 @@ class Player():
             self.shoot_cd_max = 1
         self.bullet_characters['speed'] += item[2][7]
 
+
+    def keys_dinamics(self, keys):
+        for key in keys:
+            if key == 'U':
+                self.damage_up()
+
+            if key == 'D':
+                self.damage_down()
+
+            if key == 'L':
+                self.damage_left()
+
+            if key == 'R':
+                self.damage_right()
+
+            if key == 'q':
+                self.change_weapon()
 
 
 
